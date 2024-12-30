@@ -39,6 +39,7 @@ class UserRepository():
         self.session.add(blocked_token)
 
     def is_token_blocked(self, token_id: str) -> bool:
+        print(token_id)
         return (
             self.session.scalar(
                 select(BlockedToken).where(BlockedToken.token_id == token_id)

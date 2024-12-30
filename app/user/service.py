@@ -43,7 +43,7 @@ class UserService:
         payload = decode_token(token)
         if payload['typ'] != 'refresh':
             raise InvalidTokenError()
-        if self.user_repository.is_token_blocked(payload['jti']):
+        if self.user_repository.is_token_blocked(token):
             raise BlockedTokenError()
         return payload['sub']
     
@@ -56,3 +56,6 @@ class UserService:
         self.user_repository.block_token(refresh_token, datetime.now())
 
         return self.issue_token(login_id)
+    
+    def block_refresh_token(self, token_id: str, expired_at: datetime) -> None:
+        self.user_repository.block_token(token_id, expired_at)

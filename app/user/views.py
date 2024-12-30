@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Cookie, Request
 from fastapi.responses import JSONResponse
 from app.user.dto.requests import UserSignupRequest, UserSigninRequest
 from app.user.dto.responses import UserSigninResponse
@@ -8,6 +8,7 @@ from typing import Annotated
 from app.user.service import UserService
 from app.user.errors import InvalidTokenError
 from auth.settings import JWT_SETTINGS
+from datetime import datetime
 
 user_router = APIRouter()
 security = HTTPBearer()
@@ -71,5 +72,15 @@ def refresh(
         expires=JWT_SETTINGS.refresh_token_expires_hours,
         samesite="strict"
     )
-    
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
+
+@user_router.get('/logout', status_code=200, summary="로그아웃", description="refresh_token을 쿠키에서 받아 삭제하고 성공 시 'Success'를 반환합니다.")
+def logout(
+    request: Request,
+    response: JSONResponse,
+    user_service: Annotated[UserService, Depends()],
+):
+    refresh_token = request.cookies.get("refresh_token")
+    response.delete_cookie(key="refresh_token")
+    user_service.block_refresh_token(refresh_token, datetime.now())
+    return "Success"

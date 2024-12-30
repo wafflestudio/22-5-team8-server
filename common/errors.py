@@ -4,6 +4,10 @@ class InvalidFieldFormatError(HTTPException):
     def __init__(self, field_name: str):
         super().__init__(status_code=400, detail=f"Invalid format for field {field_name}")
 
+class MissingRequiredFieldError(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=400, detail="Missing required field")
+
 class InvalidCredentialsError(HTTPException):
     def __init__(self):
         super().__init__(status_code=401, detail="Invalid credentials")
