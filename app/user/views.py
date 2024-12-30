@@ -12,15 +12,12 @@ from auth.settings import JWT_SETTINGS
 user_router = APIRouter()
 security = HTTPBearer()
 
-def login_with_cookie(
-    request: Request,
+def login_with_header(
     user_service: Annotated[UserService, Depends()],
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(security)],
 ) -> User:
-    token = request.cookies.get("access_token")
+    token = credentials.credentials
     login_id = user_service.validate_access_token(token)
-    print("#"*100)
-    print(login_id)
-    print("#"*100)
     user = user_service.get_user_by_login_id(login_id)
     if not user:
         raise InvalidTokenError()
@@ -38,7 +35,7 @@ def signup(
 @user_router.post('/signin', 
                   status_code=201, 
                   summary="로그인", 
-                  description="login_id와 login_password를 받아 로그인을 진행하고 성공 시 access_token과 refresh_token을 쿠키에 저장하고 두 토큰의을 반환합니다.")
+                  description="login_id와 login_password를 받아 로그인을 진행하고 성공 시 refresh_token을 쿠키에 저장하고 두 토큰의 값을 반환합니다.")
 def signin(
     response: JSONResponse,
     user_service: Annotated[UserService, Depends()],
@@ -46,19 +43,14 @@ def signin(
 ):
     # 토큰 발급
     access_token, refresh_token = user_service.signin(signin_request.login_id, signin_request.login_password)
-    
-    # 쿠키 설정
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        expires=JWT_SETTINGS.access_token_expires_minutes
-    )
+
+    # refresh_token은 쿠키에 담아서 반환
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        expires=JWT_SETTINGS.refresh_token_expires_hours
+        expires=JWT_SETTINGS.refresh_token_expires_hours,
+        samesite="strict",
     )
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
@@ -73,16 +65,11 @@ def refresh(
     refresh_token = request.cookies.get("refresh_token")
     access_token, refresh_token = user_service.reissue_token(refresh_token)
     response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        expires=JWT_SETTINGS.access_token_expires_minutes
-    )
-    response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        expires=JWT_SETTINGS.refresh_token_expires_hours
+        expires=JWT_SETTINGS.refresh_token_expires_hours,
+        samesite="strict"
     )
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
