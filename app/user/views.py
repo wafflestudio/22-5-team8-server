@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Cookie, Request
 from fastapi.responses import JSONResponse
 from app.user.dto.requests import UserSignupRequest, UserSigninRequest
-from app.user.dto.responses import UserSigninResponse
+from app.user.dto.responses import UserSigninResponse, MyProfileResponse
 from app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
@@ -56,6 +56,11 @@ def signin(
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
+@user_router.get('/me', status_code=200, summary="내 정보", description="access_token을 헤더에 담아 요청하면 내 정보를 반환합니다.")
+def me(
+    user: User = Depends(login_with_header)
+):
+    return MyProfileResponse(username=user.username, login_id=user.login_id, hashed_pwd=user.hashed_pwd)
 
 @user_router.get('/refresh', status_code=200, summary="토큰 갱신", description="refresh_token을 쿠키에서 받아 access_token과 refresh_token을 갱신하고 반환합니다.")
 def refresh(
