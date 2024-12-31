@@ -3,14 +3,12 @@ from pydantic import BaseModel
 class MyProfileResponse(BaseModel):
     username: str
     login_id: str
-    hashed_pwd: str
 
     @staticmethod
     def from_user(user) -> 'MyProfileResponse':
         return MyProfileResponse(
             username=user.username, 
-            login_id=user.login_id, 
-            hashed_pwd=user.hashed_pwd
+            login_id=user.login_id,
             )
 
 class UserSigninResponse(BaseModel):

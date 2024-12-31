@@ -25,13 +25,22 @@ class UserService:
         
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
         return self.issue_token(login_id)
-        
+    
+    def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
+        self.user_repository.update_user(user_id, username, login_password)
+
     def raise_if_user_exists(self, username: str, login_id: str) -> None:
         if self.user_repository.get_user(username, login_id) is not None:
             raise UserAlreadyExistsError()
         
     def get_user_by_login_id(self, login_id: str) -> User | None:
         return self.user_repository.get_user_by_login_id(login_id)
+    
+    def get_user_by_user_id(self, user_id: int) -> User | None:
+        return self.user_repository.get_user_by_user_id(user_id)
+    
+    def get_user_by_username(self, username: str) -> User | None:
+        return self.user_repository.get_user_by_username(username)
     
     def validate_access_token(self, token: str) -> dict:
         payload = decode_token(token)

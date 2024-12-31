@@ -7,6 +7,7 @@ from app.user.models import User, BlockedToken
 from passlib.context import CryptContext
 from auth.utils import create_hashed_password
 from datetime import datetime
+from app.user.errors import UserAlreadyExistsError
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -30,8 +31,25 @@ class UserRepository():
         
         return self.session.scalar(get_user_query)
     
+    def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
+        user = self.get_user_by_user_id(user_id)
+        if username is not None:
+            if self.get_user_by_username(username) is not None:
+                raise UserAlreadyExistsError()
+            user.username = username
+        if login_password is not None:
+            user.hashed_pwd = create_hashed_password(login_password)
+
     def get_user_by_login_id(self, login_id: str) -> User | None:
         get_user_query = select(User).filter(User.login_id == login_id)
+        return self.session.scalar(get_user_query)
+    
+    def get_user_by_user_id(self, user_id: int) -> User | None:
+        get_user_query = select(User).filter(User.id == user_id)
+        return self.session.scalar(get_user_query)
+    
+    def get_user_by_username(self, username: str) -> User | None:
+        get_user_query = select(User).filter(User.username == username)
         return self.session.scalar(get_user_query)
     
     def block_token(self, token_id: str, expired_at: datetime) -> None:

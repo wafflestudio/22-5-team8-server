@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Cookie, Request
 from fastapi.responses import JSONResponse
-from app.user.dto.requests import UserSignupRequest, UserSigninRequest
+from app.user.dto.requests import UserSignupRequest, UserSigninRequest, UserUpdateRequest
 from app.user.dto.responses import UserSigninResponse, MyProfileResponse
 from app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -50,8 +50,8 @@ def signin(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        expires=JWT_SETTINGS.refresh_token_expires_hours,
-        samesite="strict",
+        expires=JWT_SETTINGS.refresh_token_expires_hours*3600,
+        samesite="lax",
     )
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
@@ -61,6 +61,16 @@ def me(
     user: User = Depends(login_with_header)
 ):
     return MyProfileResponse(username=user.username, login_id=user.login_id, hashed_pwd=user.hashed_pwd)
+
+@user_router.patch('/me', status_code=200, summary="내 정보 수정", description="access_token을 헤더에 담아 요청하면 내 정보를 수정하고 성공 시 'Success'를 반환합니다.")
+def update_me(
+    user: Annotated[User, Depends(login_with_header)],
+    update_request: UserUpdateRequest,
+    user_service: Annotated[UserService, Depends()],
+):
+    user_service.update_user(user.id, username= update_request.username, login_password=update_request.login_password)
+    return "Success"
+
 
 @user_router.get('/refresh', status_code=200, summary="토큰 갱신", description="refresh_token을 쿠키에서 받아 access_token과 refresh_token을 갱신하고 반환합니다.")
 def refresh(
@@ -74,10 +84,11 @@ def refresh(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        expires=JWT_SETTINGS.refresh_token_expires_hours,
-        samesite="strict"
+        expires=JWT_SETTINGS.refresh_token_expires_hours*3600,
+        samesite="lax"
     )
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
+
 
 @user_router.get('/logout', status_code=200, summary="로그아웃", description="refresh_token을 쿠키에서 받아 삭제하고 성공 시 'Success'를 반환합니다.")
 def logout(
@@ -86,6 +97,8 @@ def logout(
     user_service: Annotated[UserService, Depends()],
 ):
     refresh_token = request.cookies.get("refresh_token")
+    if refresh_token is None:
+        raise InvalidTokenError()
     response.delete_cookie(key="refresh_token")
     user_service.block_refresh_token(refresh_token, datetime.now())
     return "Success"
