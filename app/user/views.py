@@ -24,7 +24,21 @@ def login_with_header(
         raise InvalidTokenError()
     return user
 
-@user_router.post('/signup', status_code=201, summary="회원가입", description="username, login_id, login_password를 받아 회원가입을 진행하고 성공 시 'Success'를 반환합니다.")
+@user_router.post('/signup', 
+                status_code=201, 
+                summary="회원가입", 
+                description="username, login_id, login_password를 받아 회원가입을 진행하고 성공 시 'Success'를 반환합니다.",
+                responses={
+                    201: {
+                        "description": "회원가입 성공",
+                        "content": {
+                            "application/json": {
+                                "example": "Success"
+                            }
+                        }
+                    }
+                }
+        )
 def signup(
     signup_request: UserSignupRequest,
     user_service: Annotated[UserService, Depends()]
@@ -36,7 +50,9 @@ def signup(
 @user_router.post('/signin', 
                   status_code=201, 
                   summary="로그인", 
-                  description="login_id와 login_password를 받아 로그인을 진행하고 성공 시 refresh_token을 쿠키에 저장하고 두 토큰의 값을 반환합니다.")
+                  description="login_id와 login_password를 받아 로그인을 진행하고 성공 시 refresh_token을 쿠키에 저장하고 두 토큰의 값을 반환합니다.",
+                  response_model=UserSigninResponse
+                  )
 def signin(
     response: JSONResponse,
     user_service: Annotated[UserService, Depends()],
@@ -56,7 +72,12 @@ def signin(
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
-@user_router.get('/me', status_code=200, summary="내 정보", description="access_token을 헤더에 담아 요청하면 내 정보를 반환합니다.")
+@user_router.get('/me',
+                status_code=200, 
+                summary="내 정보", 
+                description="access_token을 헤더에 담아 요청하면 내 정보를 반환합니다.",
+                response_model=MyProfileResponse
+                )
 def me(
     user: User = Depends(login_with_header)
 ):
@@ -72,7 +93,12 @@ def update_me(
     return "Success"
 
 
-@user_router.get('/refresh', status_code=200, summary="토큰 갱신", description="refresh_token을 쿠키에서 받아 access_token과 refresh_token을 갱신하고 반환합니다.")
+@user_router.get('/refresh', 
+                status_code=200, 
+                summary="토큰 갱신", 
+                description="refresh_token을 쿠키에서 받아 access_token과 refresh_token을 갱신하고 반환합니다.",
+                response_model=UserSigninResponse
+                )
 def refresh(
     request: Request,
     response: JSONResponse,
@@ -90,7 +116,21 @@ def refresh(
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
 
-@user_router.get('/logout', status_code=200, summary="로그아웃", description="refresh_token을 쿠키에서 받아 삭제하고 성공 시 'Success'를 반환합니다.")
+@user_router.get('/logout', 
+                status_code=200, 
+                summary="로그아웃", 
+                description="refresh_token을 쿠키에서 받아 삭제하고 성공 시 'Success'를 반환합니다.",
+                responses={
+                    200: {
+                        "description": "회원가입 성공",
+                        "content": {
+                            "application/json": {
+                                "example": "Success"
+                            }
+                        }
+                    }
+                }
+                )
 def logout(
     request: Request,
     response: JSONResponse,
