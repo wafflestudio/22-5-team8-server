@@ -10,7 +10,3 @@ class MyProfileResponse(BaseModel):
             username=user.username, 
             login_id=user.login_id,
             )
-
-class UserSigninResponse(BaseModel):
-    access_token: str
-    refresh_token: str

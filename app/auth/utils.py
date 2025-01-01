@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from auth.settings import JWT_SETTINGS
+from app.auth.settings import JWT_SETTINGS
 from jose.exceptions import JWTError, ExpiredSignatureError
 from common.errors import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext

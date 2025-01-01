@@ -5,7 +5,7 @@ from database.connection import get_db_session
 from typing import Annotated
 from app.user.models import User, BlockedToken
 from passlib.context import CryptContext
-from auth.utils import create_hashed_password
+from app.auth.utils import create_hashed_password
 from datetime import datetime
 from app.user.errors import UserAlreadyExistsError
 
