@@ -17,6 +17,10 @@ python-jose = "^3.3.0"
 passlib = "^1.7.4"
 pyjwt = "^2.10.1"
 bcrypt = "4.0.1"
+authlib = "^1.4.0"
+httpx = "^0.28.1"
+starlette = "0.41.0"
+itsdangerous = "^2.2.0"
 
 
 [build-system]

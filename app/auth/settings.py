@@ -31,4 +31,25 @@ class JWTSettings(BaseSettings):
         extra="ignore",  # 추가적인 환경변수는 무시
     )
 
+class OAUTHSettings(BaseSettings):
+    google_oauth_client_id: str = ""
+    google_oauth_client_secret: str = ""
+    google_oauth_redirect_uri: str = ""
+
+    @property
+    def google_oauth_client_id(self) -> str:
+        return self.google_oauth_client_id
+
+    @property
+    def google_oauth_client_secret(self) -> str:
+        return self.google_oauth_client_secret
+    
+    model_config = SettingsConfigDict(
+        case_sensitive=False, # 대소문자 구분 X
+        env_prefix="GOOGLE_OAUTH_",  # GOOGLE_OAUTH_로 시작하는 환경변수만 사용
+        env_file=SETTINGS.env_file,  # SETTINGS에서 env_file 경로를 사용
+        extra="ignore",  # 추가적인 환경변수는 무시
+    )
+
 JWT_SETTINGS = JWTSettings()
+OAUTH_SETTINGS = OAUTHSettings()

@@ -15,11 +15,17 @@ class UserRepository():
     def __init__(self, session: Annotated[Session, Depends(get_db_session)]) -> None:
         self.session = session
 
-    def add_user(self, username: str, login_id: str, login_password: str) -> None:
+    def add_user(self, username: str, login_id: str, login_password: str | None) -> None:
+        hasehd_pwd = None
+        login_type = 'social'
+        if login_password is not None:
+            hasehd_pwd = create_hashed_password(login_password)
+            login_type = 'local'
         user = User(
             username=username,
             login_id=login_id,
-            hashed_pwd=create_hashed_password(login_password) # 암호화된 비밀번호 저장
+            hashed_pwd=hasehd_pwd, # 암호화된 비밀번호 저장
+            login_type=login_type
         )
         self.session.add(user)
 

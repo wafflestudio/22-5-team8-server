@@ -75,6 +75,31 @@ def signin(
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
+@auth_router.get("/{provider}/",
+                 status_code=201,
+                 summary="소셜 로그인")
+async def social_signin(
+    request: Request,
+    provider: str,
+    auth_service: Annotated[AuthService, Depends()],
+):
+    return await auth_service.social_signin(request, provider)
+
+@auth_router.get("/{provider}/callback",
+                    status_code=201,
+                    summary="소셜 로그인 콜백")
+async def social_signin_callback(
+    request: Request,
+    provider: str,
+    auth_service: Annotated[AuthService, Depends()],
+):
+    access_token, refresh_token =  await auth_service.social_signin_callback(request, provider)
+    # 반환 값이 None, None이 아닌 경우 가입된 사용자이므로 두 개의 토큰을 반환
+    if access_token and refresh_token:
+        return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
+    # 반환 값이 None, None인 경우 가입되지 않은 사용자이므로 성공 메시지 반환
+    return "Success"
+
 @auth_router.get('/refresh', 
                 status_code=200, 
                 summary="토큰 갱신", 
