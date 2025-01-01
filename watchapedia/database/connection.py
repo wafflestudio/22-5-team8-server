@@ -2,7 +2,7 @@ from typing import Generator, Any
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from database.settings import DB_SETTINGS
+from watchapedia.database.settings import DB_SETTINGS
 
 
 class DatabaseManager:

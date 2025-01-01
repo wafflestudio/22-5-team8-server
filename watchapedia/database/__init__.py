@@ -1,1 +1,1 @@
-import app.user.models
+import watchapedia.app.user.models
