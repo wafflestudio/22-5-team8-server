@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from database.common import Base
 from sqlalchemy import DateTime
+from app.review.models import Review
 
 class User(Base):
     __tablename__ = 'user'
@@ -11,6 +12,8 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     login_id: Mapped[str] = mapped_column(String(50), nullable=False)
     hashed_pwd: Mapped[str] = mapped_column(String(100), nullable=False)
+
+    reviews: Mapped[list["Review"]] = relationship(back_populates="user")
     
 class BlockedToken(Base):
     __tablename__ = "blocked_token"
