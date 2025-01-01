@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, Cookie, Request
 from fastapi.responses import JSONResponse
-from app.user.dto.requests import UserSignupRequest, UserSigninRequest, UserUpdateRequest
-from app.user.dto.responses import UserSigninResponse, MyProfileResponse
-from app.user.models import User
+from watchapedia.app.user.dto.requests import UserSignupRequest, UserSigninRequest, UserUpdateRequest
+from watchapedia.app.user.dto.responses import UserSigninResponse, MyProfileResponse
+from watchapedia.app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
-from app.user.service import UserService
-from app.user.errors import InvalidTokenError
-from auth.settings import JWT_SETTINGS
+from watchapedia.app.user.service import UserService
+from watchapedia.app.user.errors import InvalidTokenError
+from watchapedia.auth.settings import JWT_SETTINGS
 from datetime import datetime
 
 user_router = APIRouter()

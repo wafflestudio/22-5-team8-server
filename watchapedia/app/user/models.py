@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from database.common import Base
+from watchapedia.database.common import Base
 from sqlalchemy import DateTime
 
 class User(Base):

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import api_router
+from watchapedia.api import api_router
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.requests import Request

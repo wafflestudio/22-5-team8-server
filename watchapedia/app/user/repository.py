@@ -1,13 +1,13 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from fastapi import Depends
-from database.connection import get_db_session
+from watchapedia.database.connection import get_db_session
 from typing import Annotated
-from app.user.models import User, BlockedToken
+from watchapedia.app.user.models import User, BlockedToken
 from passlib.context import CryptContext
-from auth.utils import create_hashed_password
+from watchapedia.auth.utils import create_hashed_password
 from datetime import datetime
-from app.user.errors import UserAlreadyExistsError
+from watchapedia.app.user.errors import UserAlreadyExistsError
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

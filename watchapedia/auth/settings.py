@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from settings import SETTINGS  # 기존 SETTINGS를 가져옵니다.
+from watchapedia.settings import SETTINGS  # 기존 SETTINGS를 가져옵니다.
 from datetime import timedelta
 
 class JWTSettings(BaseSettings):
