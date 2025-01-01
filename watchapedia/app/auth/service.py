@@ -1,10 +1,10 @@
 from fastapi import Depends, Request
-from app.user.repository import UserRepository
-from common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
-from app.auth.utils import verify_password, create_access_token, create_refresh_token, decode_token
-from app.auth.settings import JWT_SETTINGS
-from app.user.errors import UserAlreadyExistsError
-from app.auth.oauth import oauth
+from watchapedia.app.user.repository import UserRepository
+from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
+from watchapedia.app.auth.utils import verify_password, create_access_token, create_refresh_token, decode_token
+from watchapedia.app.auth.settings import JWT_SETTINGS
+from watchapedia.app.user.errors import UserAlreadyExistsError
+from watchapedia.app.auth.oauth import oauth
 from datetime import datetime
 from uuid import uuid4
 from typing import Annotated

@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
-from app.user.dto.requests import UserUpdateRequest
-from app.user.dto.responses import MyProfileResponse
-from app.user.models import User
+from watchapedia.app.user.dto.requests import UserUpdateRequest
+from watchapedia.app.user.dto.responses import MyProfileResponse
+from watchapedia.app.user.models import User
 from typing import Annotated
-from app.user.service import UserService
-from app.auth.views import login_with_header
+from watchapedia.app.user.service import UserService
+from watchapedia.app.auth.views import login_with_header
 
 user_router = APIRouter()
 

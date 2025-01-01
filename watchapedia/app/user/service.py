@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.user.repository import UserRepository
+from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 
 class UserService:

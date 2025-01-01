@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from common.errors import InvalidFieldFormatError
+from watchapedia.common.errors import InvalidFieldFormatError
 import re
 from typing import Annotated
 from pydantic.functional_validators import AfterValidator

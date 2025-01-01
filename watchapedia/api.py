@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from app.user.views import user_router
-from app.auth.views import auth_router
+from watchapedia.app.user.views import user_router
+from watchapedia.app.auth.views import auth_router
 
 api_router = APIRouter()
 

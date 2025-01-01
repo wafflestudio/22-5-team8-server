@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from settings import SETTINGS
+from watchapedia.settings import SETTINGS
 
 
 class DatabaseSettings(BaseSettings):

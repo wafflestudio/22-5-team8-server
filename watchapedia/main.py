@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from app.api import api_router
+from watchapedia.api import api_router
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.requests import Request
-from common.errors import MissingRequiredFieldError
+from watchapedia.common.errors import MissingRequiredFieldError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 

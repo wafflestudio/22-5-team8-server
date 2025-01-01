@@ -1,14 +1,14 @@
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
-from common.errors import InvalidTokenError
-from app.auth.service import AuthService
-from app.user.service import UserService
-from app.user.models import User
-from app.auth.settings import JWT_SETTINGS
+from watchapedia.common.errors import InvalidTokenError
+from watchapedia.app.auth.service import AuthService
+from watchapedia.app.user.service import UserService
+from watchapedia.app.user.models import User
+from watchapedia.app.auth.settings import JWT_SETTINGS
 from fastapi.responses import JSONResponse
-from app.auth.dto.requests import UserSignupRequest, UserSigninRequest
-from app.auth.dto.responses import UserSigninResponse
+from watchapedia.app.auth.dto.requests import UserSignupRequest, UserSigninRequest
+from watchapedia.app.auth.dto.responses import UserSigninResponse
 from datetime import datetime
 
 security = HTTPBearer()

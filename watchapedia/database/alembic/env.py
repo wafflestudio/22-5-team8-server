@@ -5,8 +5,8 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from database.common import Base
-from database.settings import DB_SETTINGS
+from watchapedia.database.common import Base
+from watchapedia.database.settings import DB_SETTINGS
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

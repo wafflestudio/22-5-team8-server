@@ -1,5 +1,5 @@
 from authlib.integrations.starlette_client import OAuth
-from app.auth.settings import OAUTH_SETTINGS
+from watchapedia.app.auth.settings import OAUTH_SETTINGS
 
 oauth = OAuth()
 
