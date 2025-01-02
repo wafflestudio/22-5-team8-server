@@ -5,8 +5,8 @@ from datetime import timedelta
 class JWTSettings(BaseSettings):
     secret_key: str = ""
     algorithm: str = ""
-    access_token_expires_minutes: int = 0
-    refresh_token_expires_hours: int = 0
+    access_token_expires_minutes: int = 10
+    refresh_token_expires_hours: int = 24
 
     # @property
     # def secret_key(self) -> str:
