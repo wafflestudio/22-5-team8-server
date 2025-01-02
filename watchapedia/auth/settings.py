@@ -33,4 +33,4 @@ class JWTSettings(BaseSettings):
 
 JWT_SETTINGS = JWTSettings()
 print(JWT_SETTINGS.access_token_expires_minutes)
-print(JWT_SETTINGS.refresh_token_expires_minutes)
+print(JWT_SETTINGS.refresh_token_expires_hours)
