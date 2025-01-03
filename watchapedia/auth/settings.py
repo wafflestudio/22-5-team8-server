@@ -5,24 +5,24 @@ from datetime import timedelta
 class JWTSettings(BaseSettings):
     secret_key: str = ""
     algorithm: str = ""
-    access_token_expires_minutes: int = 0
-    refresh_token_expires_hours: int = 0
+    access_token_expires_minutes: int = 10
+    refresh_token_expires_hours: int = 24
 
-    @property
-    def secret_key(self) -> str:
-        return self.secret_key
+    # @property
+    # def secret_key(self) -> str:
+    #     return self.secret_key
 
-    @property
-    def algorithm(self) -> str:
-        return self.algorithm
+    # @property
+    # def algorithm(self) -> str:
+    #     return self.algorithm
     
-    @property
-    def access_token_expires_minutes(self) -> int:
-        return self.access_token_expires_minutes
+    # @property
+    # def access_token_expires_minutes(self) -> int:
+    #     return self.access_token_expires_minutes
     
-    @property
-    def refresh_token_expires_hours(self) -> int:
-        return self.refresh_token_expires_hours
+    # @property
+    # def refresh_token_expires_hours(self) -> int:
+    #     return self.refresh_token_expires_hours
 
     model_config = SettingsConfigDict(
         case_sensitive=False, # 대소문자 구분 X
