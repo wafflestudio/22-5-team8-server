@@ -34,17 +34,8 @@ class JWTSettings(BaseSettings):
 JWT_SETTINGS = JWTSettings()
 
 class OAUTHSettings(BaseSettings):
-    google_oauth_client_id: str = ""
-    google_oauth_client_secret: str = ""
-    google_oauth_redirect_uri: str = ""
-
-    @property
-    def google_oauth_client_id(self) -> str:
-        return self.google_oauth_client_id
-
-    @property
-    def google_oauth_client_secret(self) -> str:
-        return self.google_oauth_client_secret
+    client_id: str = ""
+    client_secret: str = ""
     
     model_config = SettingsConfigDict(
         case_sensitive=False, # 대소문자 구분 X

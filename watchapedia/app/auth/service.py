@@ -2,7 +2,7 @@ from fastapi import Depends, Request
 from watchapedia.app.user.repository import UserRepository
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
 from watchapedia.app.auth.utils import verify_password, create_access_token, create_refresh_token, decode_token
-from watchapedia.app.auth.settings import JWT_SETTINGS
+from watchapedia.app.auth.settings import JWT_SETTINGS, OAUTH_SETTINGS
 from watchapedia.app.user.errors import UserAlreadyExistsError
 from watchapedia.app.auth.oauth import oauth
 from datetime import datetime
@@ -27,7 +27,12 @@ class AuthService():
         return self.issue_token(login_id)
     
     async def social_signin(self, request: Request,provider: str) -> tuple[str, str]:
-        redirect_uri = f'http://127.0.0.1:8000/api/auth/{provider}/callback' # redirect uri는 이후에 변경, 현재는 테스트용
+        base_url = str(request.url).rsplit('/', 1)[0]  # 현재 URL에서 마지막 부분을 제거
+        redirect_uri = f"{base_url}/callback"
+        print(JWT_SETTINGS.secret_key)
+        print(JWT_SETTINGS.algorithm)
+        print(OAUTH_SETTINGS.client_id)
+        print(OAUTH_SETTINGS.client_secret)
         return await oauth.create_client(provider).authorize_redirect(request, redirect_uri) # 인증 서버로 이동, 인증 서버에서 토큰 발급 후 콜백 주소로 리다이렉트
     
     async def social_signin_callback(self, request: Request,provider: str) -> tuple[str, str]:
