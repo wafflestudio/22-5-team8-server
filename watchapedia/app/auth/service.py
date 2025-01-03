@@ -1,10 +1,11 @@
-from fastapi import Depends, Request
+from fastapi import Depends
+import requests
 from watchapedia.app.user.repository import UserRepository
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
 from watchapedia.app.auth.utils import verify_password, create_access_token, create_refresh_token, decode_token
 from watchapedia.app.auth.settings import JWT_SETTINGS, OAUTH_SETTINGS
+from watchapedia.app.auth.errors import GoogleOAuthError
 from watchapedia.app.user.errors import UserAlreadyExistsError
-from watchapedia.app.auth.oauth import oauth
 from datetime import datetime
 from uuid import uuid4
 from typing import Annotated
@@ -17,37 +18,38 @@ class AuthService():
             self.raise_if_user_exists(username, login_id)
             self.user_repository.add_user(username=username, login_id=login_id, login_password=login_password)
 
-    def signin(self, login_id: str, login_password: str | None) -> tuple[str, str]:
+    def signin(self, login_id: str, login_password: str) -> tuple[str, str]:
         user = self.user_repository.get_user_by_login_id(login_id)
-        if login_password is not None:
-            if user is None or verify_password(login_password, user.hashed_pwd) is False:
-                raise InvalidCredentialsError()
+        if user is None or verify_password(login_password, user.hashed_pwd) is False:
+            raise InvalidCredentialsError()
             
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
         return self.issue_token(login_id)
     
-    async def social_signin(self, request: Request,provider: str) -> tuple[str, str]:
-        base_url = str(request.url).rsplit('/', 1)[0]  # 현재 URL에서 마지막 부분을 제거
-        redirect_uri = f"{base_url}/callback"
-        print(JWT_SETTINGS.secret_key)
-        print(JWT_SETTINGS.algorithm)
-        print(OAUTH_SETTINGS.client_id)
-        print(OAUTH_SETTINGS.client_secret)
-        return await oauth.create_client(provider).authorize_redirect(request, redirect_uri) # 인증 서버로 이동, 인증 서버에서 토큰 발급 후 콜백 주소로 리다이렉트
-    
-    async def social_signin_callback(self, request: Request,provider: str) -> tuple[str, str]:
-        token = await oauth.create_client(provider).authorize_access_token(request) # 인증 서버로부터 토큰 발급
-        print(token)
-        # 토큰을 통해 사용자 정보 가져오기
-        if provider == 'google':
-            userinfo = token['userinfo']
-        email = userinfo['email'] # 이메일을 login_id로 사용
-        username = userinfo['email'].split('@')[0] # username은 이메일 주소에서 @ 앞부분
-        if self.user_repository.get_user_by_login_id(email) is None: # 이미 가입된 사용자인지 확인
-            self.user_repository.add_user(username=username, login_id=email, login_password=None) # 가입되지 않은 사용자라면 가입, 소셜 로그인은 비밀번호가 없음
+    async def social_signin(self, code: str) -> tuple[str, str]:
+        GOOGLE_CALLBACK_URI = "https://d2vsqxcvld4zf7.cloudfront.net/sign_in/naver/callback"
+        try:
+            token_url = f"https://oauth2.googleapis.com/token?client_id={OAUTH_SETTINGS.client_id}&client_secret={OAUTH_SETTINGS.client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}"
+            token_response = await requests.post(token_url)
+            if token_response.status_code != 200:
+                raise GoogleOAuthError()
+            # google에 회원 정보 요청
+            access_token = token_response.json()['access_token']
+            user_info = f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}"
+            user_response = await requests.get(user_info)
+            if user_response.status_code != 200:
+                raise GoogleOAuthError()
+        except:
+            raise GoogleOAuthError()
+        
+        email = user_response.json()['email']
+        username = email.split('@')[0]
+
+        if self.user_repository.get_user_by_login_id(email) is None:
+            self.add_user(username, email, None)
             return None, None
         else:
-            return self.signin(email, None)
+            return self.issue_token(email)
 
     
     def validate_access_token(self, token: str) -> str:

@@ -65,3 +65,6 @@ class UserSigninRequest(BaseModel):
 class UserUpdateRequest(BaseModel):
     username: Annotated[str | None, AfterValidator(validate_username)] = None
     login_password: Annotated[str | None, AfterValidator(validate_password)] = None
+
+class SocialLogin(BaseModel):
+    code: str

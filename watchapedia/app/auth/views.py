@@ -7,13 +7,28 @@ from watchapedia.app.user.service import UserService
 from watchapedia.app.user.models import User
 from watchapedia.app.auth.settings import JWT_SETTINGS
 from fastapi.responses import JSONResponse
-from watchapedia.app.auth.dto.requests import UserSignupRequest, UserSigninRequest
+from watchapedia.app.auth.dto.requests import UserSignupRequest, UserSigninRequest, SocialLogin
 from watchapedia.app.auth.dto.responses import UserSigninResponse
 from datetime import datetime
+from watchapedia.app.auth.errors import InvalidLoginProviderError
+from enum import Enum
 
 security = HTTPBearer()
 
 auth_router = APIRouter()
+
+class PROVIDER_ENUM(Enum):
+    GOOGLE = ('google')
+
+    def __init__(self, title):
+        self.title = title
+
+    @classmethod
+    def from_str(cls, name: str):
+        for enum in cls:
+            if enum.value == name:
+                return enum
+
 
 def login_with_header(
     auth_service: Annotated[AuthService, Depends()],
@@ -59,7 +74,7 @@ def signup(
 def signin(
     response: JSONResponse,
     auth_service: Annotated[AuthService, Depends()],
-    signin_request: UserSigninRequest
+    signin_request: UserSigninRequest,
 ):
     # 토큰 발급
     access_token, refresh_token = auth_service.signin(signin_request.login_id, signin_request.login_password)
@@ -75,29 +90,23 @@ def signin(
     
     return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
-@auth_router.get("/{provider}/",
+@auth_router.post("/{provider}/",
                  status_code=201,
-                 summary="소셜 로그인")
+                 summary="소셜 로그인",
+                 description="소셜 로그인을 진행하고 성공했을 때 이미 회원가입된 유저라면 액세스 토큰과 리프레시 토큰을 반환하고, 회원가입되지 않은 유저라면 회원가입을 진행하고 Success를 반환합니다",)
 async def social_signin(
-    request: Request,
     provider: str,
+    form: SocialLogin,
     auth_service: Annotated[AuthService, Depends()],
 ):
-    return await auth_service.social_signin(request, provider)
-
-@auth_router.get("/{provider}/callback",
-                    status_code=201,
-                    summary="소셜 로그인 콜백")
-async def social_signin_callback(
-    request: Request,
-    provider: str,
-    auth_service: Annotated[AuthService, Depends()],
-):
-    access_token, refresh_token =  await auth_service.social_signin_callback(request, provider)
-    # 반환 값이 None, None이 아닌 경우 가입된 사용자이므로 두 개의 토큰을 반환
+    provider = PROVIDER_ENUM.from_str(provider.lower())
+    if not provider:
+        raise InvalidLoginProviderError()
+    if provider == PROVIDER_ENUM.GOOGLE:
+        access_token, refresh_token = await auth_service.social_signin(form.code)
+    
     if access_token and refresh_token:
         return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
-    # 반환 값이 None, None인 경우 가입되지 않은 사용자이므로 성공 메시지 반환
     return "Success"
 
 @auth_router.get('/refresh', 
