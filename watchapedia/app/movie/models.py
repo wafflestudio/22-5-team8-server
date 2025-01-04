@@ -1,5 +1,6 @@
-from sqlalchemy import Integer, String, Float, ForeignKey
+from sqlalchemy import Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
+from datetime import datetime
 from database.common import Base
 from watchapedia.app.review.models import Review
 from watchapedia.app.genre.models import Genre
@@ -20,13 +21,14 @@ class Movie(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
+    original_title: Mapped[str] = mapped_column(String(100), nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
-    synopsis: Mapped[str] = mapped_column(String(500), nullable=False, default="등록된 소개글이 없습니다.")
-    average_rating: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    synopsis: Mapped[str] = mapped_column(String(1000), nullable=False, default="등록된 소개글이 없습니다.")
+    average_rating: Mapped[float | None] = mapped_column(Float, default=None)
     running_time: Mapped[int] = mapped_column(Integer, nullable=False)
-    grade: Mapped[str] = mapped_column(String(20), nullable=False)
-    poster_url: Mapped[str] = mapped_column(String(200), nullable=False)
-    backdrop_url: Mapped[str] = mapped_column(String(200), nullable=False)
+    grade: Mapped[str | None] = mapped_column(String(20))
+    poster_url: Mapped[str | None] = mapped_column(String(500))
+    backdrop_url: Mapped[str | None] = mapped_column(String(500))
 
     reviews: Mapped[list["Review"]] = relationship(back_populates="movie")
     
