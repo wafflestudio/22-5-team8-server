@@ -15,7 +15,17 @@ class MovieParticipant(Base):
 
     role: Mapped[str] = mapped_column(String(50), nullable=False)
 
-
+class Chart(Base):
+    __tablename__ = "chart"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    platform: Mapped[str] = mapped_column(String(50), nullable=False)
+    rank: Mapped[int] = mapped_column(Integer, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    
+    movie_id: Mapped[int] = mapped_column(Integer, ForeignKey("movie.id"), nullable=False, primary_key=True)
+    movie: Mapped["Movie"] = relationship("Movie", back_populates="charts")
+    
 class Movie(Base):
     __tablename__ = "movie"
 
@@ -30,10 +40,12 @@ class Movie(Base):
     poster_url: Mapped[str | None] = mapped_column(String(500))
     backdrop_url: Mapped[str | None] = mapped_column(String(500))
 
-    reviews: Mapped[list["Review"]] = relationship(back_populates="movie")
+    reviews: Mapped[list["Review"]] = relationship("Review", back_populates="movie")
     
     genres: Mapped[list["Genre"]] = relationship(secondary="movie_genre", back_populates="movies")
     countries: Mapped[list["Country"]] = relationship(secondary="movie_country", back_populates="movies")
 
     movie_participants: Mapped[list[MovieParticipant]] = relationship(MovieParticipant) # movie checks role
     participants: Mapped[list["Participant"]] = relationship(secondary="movie_participant", back_populates="movies")
+    
+    charts: Mapped[list["Chart"]] = relationship("Chart", back_populates="movie")

@@ -16,7 +16,7 @@ class Review(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     movie_id: Mapped[int] = mapped_column(ForeignKey("movie.id"), nullable=False)
-    movie: Mapped["Movie"] = relationship(back_populates="reviews")
+    movie: Mapped["Movie"] = relationship("Movie", back_populates="reviews")
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
-    user: Mapped["User"] = relationship(back_populates="reviews")
+    user: Mapped["User"] = relationship("User", back_populates="reviews")
