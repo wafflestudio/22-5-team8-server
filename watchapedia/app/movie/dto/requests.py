@@ -9,12 +9,6 @@ def validate_year(value: int | None) -> str | None:
         return value
     if value < 1895:
         raise InvalidFieldFormatError("year")
-    
-def validate_average_rating(value: float | None) -> float | None:
-    if value is None:
-        return value
-    if value < 0.0 or value > 5.0:
-        raise InvalidFieldFormatError("average_rating")
 
 def validate_running_time(value: int | None) -> int | None:
     if value is None:
@@ -34,12 +28,26 @@ def validate_url(value: str | None) -> str | None:
         return value
     
 
+class AddParticipantsRequest(BaseModel):
+    name: str
+    role: str
+    profile_url: str | None = None
+
 class AddMovieRequest(BaseModel):
     title: str
+    original_title: str
     year: Annotated[int, AfterValidator(validate_year)]
     synopsis: str | None = None
-    average_rating: Annotated[float | None, AfterValidator(validate_average_rating)] = None
     running_time: Annotated[int, AfterValidator(validate_running_time)]
-    grade: Annotated[str, AfterValidator(validate_grade)]
-    poster_url: str
-    backdrop_url: str
+    grade: Annotated[str | None, AfterValidator(validate_grade)] = None
+    poster_url: str | None = None
+    backdrop_url: str | None = None
+    genres: list[str]
+    countries: list[str]
+    participants: list[AddParticipantsRequest]
+    
+class UpdateMovieRequest(BaseModel):
+    synopsis: str | None = None
+    grade: Annotated[str | None, AfterValidator(validate_grade)] = None
+    poster_url: str | None = None
+    backdrop_url: str | None = None
