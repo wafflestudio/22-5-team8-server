@@ -3,29 +3,23 @@ from watchapedia.common.errors import InvalidFieldFormatError
 from typing import Annotated
 from pydantic.functional_validators import AfterValidator
 
-def validate_year(value: int | None) -> str | None:
+def validate_year(value: int | None) -> str:
     # 최초의 영화는 '열차의 도착'이란 프랑스 영화로, 1895년 작이다.
-    if value is None:
-        return value
-    if value < 1895:
+    if value is None or value < 1895:
         raise InvalidFieldFormatError("year")
+    return value
 
-def validate_running_time(value: int | None) -> int | None:
-    if value is None:
-        return value
-    if value < 1 or value > 900:
+def validate_running_time(value: int | None) -> int:
+    if value is None or value < 1 or value > 900:
         raise InvalidFieldFormatError("running time")
+    return value
     
-def validate_grade(value: str | None) -> str | None:
-    if value is None:
-        return value
+def validate_grade(value: str | None) -> str:
     allowed_grades = {"전체", "12세", "15세", "청불"}
-    if value not in allowed_grades:
+    if value is None or value not in allowed_grades:
         raise InvalidFieldFormatError("grade")
+    return value
 
-def validate_url(value: str | None) -> str | None:
-    if value is None:
-        return value
     
 
 class AddParticipantsRequest(BaseModel):

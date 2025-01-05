@@ -1,10 +1,12 @@
 from sqlalchemy import Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from database.common import Base
+from watchapedia.database.common import Base
 from sqlalchemy import DateTime
-from watchapedia.app.movie.models import Movie
-from watchapedia.app.user.models import User
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from watchapedia.app.movie.models import Movie
+    from watchapedia.app.user.models import User
 
 class Review(Base):
     __tablename__ = "review"

@@ -1,11 +1,13 @@
 from sqlalchemy import Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from database.common import Base
-from watchapedia.app.review.models import Review
-from watchapedia.app.genre.models import Genre
-from watchapedia.app.country.models import Country
-from watchapedia.app.participant.models import Participant
+from watchapedia.database.common import Base
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from watchapedia.app.review.models import Review
+    from watchapedia.app.genre.models import Genre
+    from watchapedia.app.country.models import Country
+    from watchapedia.app.participant.models import Participant
 
 class MovieParticipant(Base):
     __tablename__ = "movie_participant"

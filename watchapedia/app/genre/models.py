@@ -1,7 +1,9 @@
 from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from watchapedia.database.common import Base
-from watchapedia.app.movie.models import Movie
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from watchapedia.app.movie.models import Movie
 
 class MovieGenre(Base):
     __tablename__ = "movie_genre"

@@ -1,9 +1,11 @@
 from sqlalchemy import Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from watchapedia.database.common import Base
-from watchapedia.app.review.models import Review
 from sqlalchemy import DateTime
+from watchapedia.database.common import Base
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from watchapedia.app.review.models import Review
 
 class User(Base):
     __tablename__ = 'user'
@@ -13,7 +15,7 @@ class User(Base):
     login_id: Mapped[str] = mapped_column(String(50), nullable=False)
     hashed_pwd: Mapped[str] = mapped_column(String(100), nullable=False)
     
-    reviews: Mapped[list["Review"]] = relationship(back_populates="movie")
+    reviews: Mapped[list["Review"]] = relationship("Review", back_populates="user")
     
 class BlockedToken(Base):
     __tablename__ = "blocked_token"
