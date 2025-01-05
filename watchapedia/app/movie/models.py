@@ -50,6 +50,5 @@ class Movie(Base):
     countries: Mapped[list["Country"]] = relationship(secondary="movie_country", back_populates="movies")
 
     movie_participants: Mapped[list[MovieParticipant]] = relationship("MovieParticipant", back_populates="movie")
-    participants: Mapped[list["Participant"]] = relationship(secondary="movie_participant", back_populates="movies")
     
     charts: Mapped[list["Chart"]] = relationship("Chart", back_populates="movie")

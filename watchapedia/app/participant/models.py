@@ -13,6 +13,5 @@ class Participant(Base):
     profile_url: Mapped[str | None] = mapped_column(String(500))
     biography: Mapped[str | None] = mapped_column(String(500), default=None)
 
-    movies: Mapped[list["Movie"]] = relationship(secondary="movie_participant", back_populates="participants")
     movie_participants: Mapped[list["MovieParticipant"]] = relationship("MovieParticipant", back_populates="participant")
 
