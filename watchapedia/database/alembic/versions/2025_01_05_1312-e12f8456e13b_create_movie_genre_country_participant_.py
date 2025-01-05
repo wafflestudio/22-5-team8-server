@@ -57,7 +57,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('movie_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['movie_id'], ['movie.id'], ),
-    sa.PrimaryKeyConstraint('id', 'movie_id')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('movie_country',
     sa.Column('movie_id', sa.Integer(), nullable=False),

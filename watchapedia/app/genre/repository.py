@@ -20,11 +20,11 @@ class GenreRepository():
         return genre
     
     def add_genre_with_movie(self, name: str, movie: Movie) -> None:
-        if self.get_genre_by_genre_name(name):
-            raise GenreAlreadyExistsError()
-        genre = Genre(name=name)
+        genre = self.get_genre_by_genre_name(name)
+        if not genre:
+            genre = Genre(name=name)
+            self.session.add(genre)
         genre.movies.append(movie)
-        self.session.add(genre)
         self.session.flush()
     
     def get_genre_by_genre_name(self, name: str) -> Genre | None:

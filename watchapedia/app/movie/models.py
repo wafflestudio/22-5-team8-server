@@ -27,7 +27,7 @@ class Chart(Base):
     rank: Mapped[int] = mapped_column(Integer, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     
-    movie_id: Mapped[int] = mapped_column(Integer, ForeignKey("movie.id"), nullable=False, primary_key=True)
+    movie_id: Mapped[int] = mapped_column(Integer, ForeignKey("movie.id"), nullable=False)
     movie: Mapped["Movie"] = relationship("Movie", back_populates="charts")
     
 class Movie(Base):

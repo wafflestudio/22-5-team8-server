@@ -22,11 +22,11 @@ class ParticipantRepository():
     
     def add_participant_with_movie(self, name: str, profile_url: str | None, role: str, movie: Movie) -> None:
         # 프로필 이미지 없는 동명이인-> 불허
-        if self.get_participant(name, profile_url):
-            raise ParticipantAlreadyExistsError()
-        participant = Participant(name=name, profile_url=profile_url)
-        self.session.add(participant)
-        self.session.flush()
+        participant = self.get_participant(name, profile_url)
+        if not participant:
+            participant = Participant(name=name, profile_url=profile_url)
+            self.session.add(participant)
+            self.session.flush()
         
         movie_participant = MovieParticipant(movie_id=movie.id, participant_id=participant.id, role=role)
         self.session.add(movie_participant)

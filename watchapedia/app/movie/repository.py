@@ -4,7 +4,7 @@ from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated
 from datetime import datetime
-from watchapedia.app.movie.models import Movie, MovieParticipant
+from watchapedia.app.movie.models import Movie, MovieParticipant, Chart
 from watchapedia.app.participant.models import Participant
 
 class MovieRepository():
@@ -51,6 +51,27 @@ class MovieRepository():
             movie.backdrop_url = backdrop_url
         
         self.session.flush()
+    
+    def update_chart(self, chart_type: str, rank: int, movie: Movie) -> None:
+        chart_rank = self.get_chart_rank_by_chart_type(chart_type, movie)
+        if chart_rank:
+            # update chart
+            chart_rank.rank = rank
+            chart_rank.updated_at = datetime.now()
+        else:
+            # create chart
+            chart_rank = Chart(
+                platform=chart_type,
+                rank=rank,
+                updated_at=datetime.now(),
+                movie=movie
+            )
+            self.session.add(chart_rank)
+        self.session.flush()
+    
+    def get_chart_rank_by_chart_type(self, chart_type: str, movie: Movie) -> Chart | None:
+        get_chart_query = select(Chart).filter((Chart.platform == chart_type) & (Chart.movie_id == movie.id))
+        return self.session.scalar(get_chart_query)
             
     def add_movie_participant(self, movie: Movie, participant: Participant, role: str) -> None:
         movie_participant = MovieParticipant(movie.id, participant.id, role)

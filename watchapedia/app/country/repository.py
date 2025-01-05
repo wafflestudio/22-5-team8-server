@@ -20,11 +20,11 @@ class CountryRepository():
         return country
     
     def add_country_with_movie(self, name: str, movie: Movie) -> None:
-        if self.get_country_by_country_name(name):
-            raise CountryAlreadyExistsError()
-        country = Country(name=name)
+        country = self.get_country_by_country_name(name)
+        if not country:
+            country = Country(name=name)
+            self.session.add(country)
         country.movies.append(movie)
-        self.session.add(country)
         self.session.flush()
     
     def get_country_by_country_name(self, name: str) -> Country | None:

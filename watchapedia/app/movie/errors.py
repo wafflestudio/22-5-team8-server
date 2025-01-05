@@ -8,6 +8,6 @@ class MovieNotFoundError(HTTPException):
     def __init__(self):
         super().__init__(status_code=404, detail="Movie Not Found")
 
-class InvalidUpdateError(HTTPException):
+class InvalidFormatError(HTTPException):
     def __init__(self):
-        super().__init__(status_code=400, detail="Invalid Update")
+        super().__init__(status_code=400, detail="Invalid Format")
