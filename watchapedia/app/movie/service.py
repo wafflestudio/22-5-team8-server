@@ -54,17 +54,17 @@ class MovieService():
             # genre 추가 및 연결
             for genre_name in genres:
                 self.genre_repository.add_genre_with_movie(genre_name, movie)
-            
+
             # country 추가 및 연결
             for country_name in countries:
                 self.country_repository.add_country_with_movie(country_name, movie)
-                
+
             # participant 추가 및 연결
             for participant_data in participants:
                 self.participant_repository.add_participant_with_movie(
                     participant_data.name, participant_data.profile_url, participant_data.role, movie
                 )
-                
+
             # chart crawling의 경우, 차트 추가 및 연결
             if chart_type and rank:
                 self.movie_repository.update_chart(chart_type, rank, movie)
@@ -94,17 +94,24 @@ class MovieService():
         return self._process_movie_response(movie)
     
     def update_movie(
-        self, movie_id: int, synopsis: str | None, grade: str | None, poster_url: str | None, backdrop_url: str | None
+        self, 
+        movie_id: int, 
+        synopsis: str | None, 
+        grade: str | None, 
+        average_rating: float | None, 
+        poster_url: str | None, 
+        backdrop_url: str | None
     ) -> None:
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
         if not movie:
             raise MovieNotFoundError()
-        if not any([synopsis, grade, poster_url, backdrop_url]):
+        if not any([synopsis, grade, average_rating, poster_url, backdrop_url]):
             raise InvalidFormatError()
         self.movie_repository.update_movie(
             movie=movie,
             synopsis=synopsis,
             grade=grade,
+            average_rating=average_rating,
             poster_url=poster_url,
             backdrop_url=backdrop_url
         )

@@ -54,6 +54,7 @@ def update_movie(
         movie_id,
         update_movie_request.synopsis,
         update_movie_request.grade,
+        update_movie_request.average_rating,
         update_movie_request.poster_url,
         update_movie_request.backdrop_url
     )
@@ -73,3 +74,16 @@ def crawl_movie_chart(
     crawler = MovieChartCrawler(chart_type, movie_service)
     crawler.start_crawling()
     return "Success"
+
+@movie_router.get("",
+                status_code=200,
+                summary="영화 리스트 조회",
+                description="주어진 조건에 따른 영화 리스트를 반환합니다. 가능한 조건은 [제목/차트이름/최소별점/최대별점/장르/국가] 입니다. 최대 30개의 영화 정보를 반환할 수 있습니다.")
+def get_movie_list(
+    movie_service: Annotated[MovieService, Depends()],
+    title: str | None = None,
+    chart_type: str | None = None,
+    min_rating: float | None = None,
+    max_rating: float | None = None,
+):
+    ...

@@ -43,5 +43,6 @@ class AddMovieRequest(BaseModel):
 class UpdateMovieRequest(BaseModel):
     synopsis: str | None = None
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
+    average_rating: float | None = None
     poster_url: str | None = None
     backdrop_url: str | None = None

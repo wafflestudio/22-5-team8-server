@@ -39,12 +39,20 @@ class MovieRepository():
         return movie
     
     def update_movie(
-        self, movie: Movie, synopsis: str | None, grade: str | None, poster_url: str | None, backdrop_url: str | None
+        self, 
+        movie: Movie, 
+        synopsis: str | None, 
+        grade: str | None, 
+        average_rating: float | None, 
+        poster_url: str | None, 
+        backdrop_url: str | None
     ) -> None:
         if synopsis:
             movie.synopsis = synopsis
         if grade:
             movie.grade = grade
+        if average_rating:
+            movie.average_rating = average_rating
         if poster_url:
             movie.poster_url = poster_url
         if backdrop_url:
