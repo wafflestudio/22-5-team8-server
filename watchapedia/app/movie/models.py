@@ -14,8 +14,10 @@ class MovieParticipant(Base):
 
     movie_id: Mapped[int] = mapped_column(Integer, ForeignKey("movie.id"), nullable=False, primary_key=True)
     participant_id: Mapped[int] = mapped_column(Integer, ForeignKey("participant.id"), nullable=False, primary_key=True)
-
     role: Mapped[str] = mapped_column(String(50), nullable=False)
+    
+    movie: Mapped["Movie"] = relationship("Movie", back_populates="movie_participants")
+    participant: Mapped["Participant"] = relationship("Participant", back_populates="movie_participants")
 
 class Chart(Base):
     __tablename__ = "chart"
@@ -47,7 +49,7 @@ class Movie(Base):
     genres: Mapped[list["Genre"]] = relationship(secondary="movie_genre", back_populates="movies")
     countries: Mapped[list["Country"]] = relationship(secondary="movie_country", back_populates="movies")
 
-    movie_participants: Mapped[list[MovieParticipant]] = relationship(MovieParticipant) # movie checks role
+    movie_participants: Mapped[list[MovieParticipant]] = relationship("MovieParticipant", back_populates="movie")
     participants: Mapped[list["Participant"]] = relationship(secondary="movie_participant", back_populates="movies")
     
     charts: Mapped[list["Chart"]] = relationship("Chart", back_populates="movie")

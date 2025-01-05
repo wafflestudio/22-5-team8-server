@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from watchapedia.app.movie.models import Movie
 
 class ParticipantsDataResponse(BaseModel):
+    id: int
     name: str
     role: str
     profile_url: str | None

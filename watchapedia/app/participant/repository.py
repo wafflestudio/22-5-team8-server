@@ -20,7 +20,7 @@ class ParticipantRepository():
         self.session.flush()
         return participant
     
-    def add_participant_with_movie(self, name: str, profile_url: str | None, role: str, movie: Movie) -> MovieParticipant:
+    def add_participant_with_movie(self, name: str, profile_url: str | None, role: str, movie: Movie) -> None:
         # 프로필 이미지 없는 동명이인-> 불허
         if self.get_participant(name, profile_url):
             raise ParticipantAlreadyExistsError()
@@ -31,7 +31,6 @@ class ParticipantRepository():
         movie_participant = MovieParticipant(movie_id=movie.id, participant_id=participant.id, role=role)
         self.session.add(movie_participant)
         self.session.flush()
-        return movie_participant
     
     def get_participant(self, name: str, profile_url: str | None) -> Participant | None:
         get_participant_query =  select(Participant).filter(

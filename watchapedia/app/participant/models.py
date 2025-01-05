@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from watchapedia.database.common import Base
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from watchapedia.app.movie.models import Movie
+    from watchapedia.app.movie.models import Movie, MovieParticipant
 
 class Participant(Base):
     __tablename__ = "participant"
@@ -14,4 +14,5 @@ class Participant(Base):
     biography: Mapped[str | None] = mapped_column(String(500), default=None)
 
     movies: Mapped[list["Movie"]] = relationship(secondary="movie_participant", back_populates="participants")
+    movie_participants: Mapped[list["MovieParticipant"]] = relationship("MovieParticipant", back_populates="participant")
 

@@ -56,12 +56,10 @@ class MovieService():
             self.country_repository.add_country_with_movie(country_name, movie)
             
         # participant 추가 및 연결
-        participants_list = []
         for participant_data in participants:
-            movie_participant = self.participant_repository.add_participant_with_movie(
+            self.participant_repository.add_participant_with_movie(
                 participant_data.name, participant_data.profile_url, participant_data.role, movie
             )
-            participants_list.append(movie_participant)
         
         return MovieDataResponse(
             id=movie.id,
@@ -78,11 +76,12 @@ class MovieService():
             backdrop_url=backdrop_url,
             participants=[
                 ParticipantsDataResponse(
-                    name=participant.name,
+                    id=participant.participant_id,
+                    name=participant.participant.name,
                     role=participant.role,
-                    profile_url=participant.profile_url
+                    profile_url=participant.participant.profile_url
                 )
-                for participant in participants
+                for participant in movie.movie_participants
             ]
         )
 
