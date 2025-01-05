@@ -116,8 +116,28 @@ class MovieService():
             backdrop_url=backdrop_url
         )
     
-    def get_movie():
-        ...
+    def search_movie_list(
+        self,
+        title: str | None = None,
+        chart_type: str | None = None,
+        min_rating: float | None = None,
+        max_rating: float | None = None,
+        genres: list[str] | None = None,
+        countries: list[str] | None = None,
+        participant_id: int | None = None
+    ) -> list[MovieDataResponse]:
+        if not any([title, chart_type, min_rating, max_rating, genres, countries, participant_id]):
+            raise InvalidFormatError()
+        movies = self.movie_repository.search_movie_list(
+            title=title,
+            chart_type=chart_type,
+            min_rating=min_rating,
+            max_rating=max_rating,
+            genres=genres,
+            countries=countries,
+            participant_id=participant_id
+        )
+        return [ self._process_movie_response(movie) for movie in movies ]
         
     def _process_movie_response(self, movie: Movie) -> MovieDataResponse:
         return MovieDataResponse(

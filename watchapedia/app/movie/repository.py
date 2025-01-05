@@ -1,6 +1,8 @@
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import Sequence, func, select
+from sqlalchemy.orm import Session, joinedload
 from fastapi import Depends
+from watchapedia.app.country.models import Country
+from watchapedia.app.genre.models import Genre
 from watchapedia.database.connection import get_db_session
 from typing import Annotated
 from datetime import datetime
@@ -76,6 +78,61 @@ class MovieRepository():
             )
             self.session.add(chart_rank)
         self.session.flush()
+        
+    def search_movie_list(
+        self,
+        title: str | None = None,
+        chart_type: str | None = None,
+        min_rating: float | None = None,
+        max_rating: float | None = None,
+        genres: list[str] | None = None,
+        countries: list[str] | None = None,
+        participant_id: int | None = None
+    ) -> Sequence[Movie]:
+        type_dict = {"box_office": 30, "watcha_buying": 30, "watcha10": 10, "netflix": 10}
+        stmt = select(Movie).options(
+            joinedload(Movie.genres),
+            joinedload(Movie.countries),
+            joinedload(Movie.movie_participants).joinedload(MovieParticipant.participant)
+        )   # eager loading
+
+        if title:
+            stmt = stmt.where(Movie.title.ilike(f"%{title}%"))  # 대소문자 구분X, 부분 일치 지원
+
+        if chart_type:
+            stmt = stmt.join(Chart).where(Chart.platform == chart_type)
+
+        if min_rating:
+            stmt = stmt.where(Movie.average_rating >= min_rating)
+        if max_rating:
+            stmt = stmt.where(Movie.average_rating <= max_rating)
+
+        if genres:
+            stmt = stmt.join(Movie.genres).filter(Genre.name.in_(genres))  # 해당 장르 중 하나라도 포함된 영화만 찾음
+            stmt = stmt.group_by(Movie.id).having(func.count(Genre.id) == len(genres))
+        
+        if countries:
+            stmt = stmt.join(Movie.countries).filter(Country.name.in_(countries))  # 해당 장르 중 하나라도 포함된 영화만 찾음
+            stmt = stmt.group_by(Movie.id).having(func.count(Country.id) == len(countries))
+
+        if participant_id:
+            stmt = stmt.join(Movie.movie_participants).where(MovieParticipant.participant_id == participant_id)
+
+        
+        # 최신 순으로 정렬 - 차트 역순
+        if chart_type:
+            stmt = stmt.order_by(Chart.updated_at.desc())
+    
+        # 반환 개수 제한
+        limit = type_dict.get(chart_type, None)
+        if limit:
+            stmt = stmt.limit(limit)
+            
+        # 중복 제거
+        stmt = stmt.distinct()
+
+        movies = self.session.scalars(stmt).unique()
+        return movies
     
     def get_chart_rank_by_chart_type(self, chart_type: str, movie: Movie) -> Chart | None:
         get_chart_query = select(Chart).filter((Chart.platform == chart_type) & (Chart.movie_id == movie.id))

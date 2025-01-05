@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from typing import Annotated
+from fastapi import APIRouter, Depends, Query
+from typing import Annotated, List, Optional
 from watchapedia.app.movie.errors import InvalidFormatError
 from watchapedia.app.movie.service import MovieService
 from watchapedia.app.movie.crawling import MovieChartCrawler
@@ -44,7 +44,7 @@ def get_movie(
 @movie_router.patch("/{movie_id}",
                 status_code=200,
                 summary="영화 정보 업데이트",
-                description="특정 영화의 데이터를 업데이트 한 후 성공 시 'Success'를 반환합니다. 업데이트 가능한 항목은 synopsis, grade, poster_url, backdrop_url 입니다.")
+                description="특정 영화의 데이터를 업데이트 한 후 성공 시 'Success'를 반환합니다. 업데이트 가능한 항목은 [synopsis, grade, average_rating, poster_url, backdrop_url] 입니다.")
 def update_movie(
     movie_id: int,
     update_movie_request: UpdateMovieRequest,
@@ -78,12 +78,15 @@ def crawl_movie_chart(
 @movie_router.get("",
                 status_code=200,
                 summary="영화 리스트 조회",
-                description="주어진 조건에 따른 영화 리스트를 반환합니다. 가능한 조건은 [제목/차트이름/최소별점/최대별점/장르/국가] 입니다. 최대 30개의 영화 정보를 반환할 수 있습니다.")
-def get_movie_list(
+                description="주어진 조건에 따른 영화 리스트를 반환합니다. 가능한 조건은 [제목/차트이름/최소별점/최대별점/장르/국가] 입니다. 장르와 국가는 여러 개 입력할 수 있습니다. 차트 영화 정보는 역순으로 제공합니다.")
+def search_movie_list(
     movie_service: Annotated[MovieService, Depends()],
     title: str | None = None,
     chart_type: str | None = None,
-    min_rating: float | None = None,
+    min_rating: float | None = None,  
     max_rating: float | None = None,
-):
-    ...
+    genres: list[str] | None = Query(None), 
+    countries: list[str] | None = Query(None),
+    participant_id: int | None = None
+) -> list[MovieDataResponse]:
+    return movie_service.search_movie_list(title, chart_type, min_rating, max_rating, genres, countries, participant_id)
