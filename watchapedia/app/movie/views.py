@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from typing import Annotated
 from watchapedia.app.movie.service import MovieService
-from watchapedia.app.movie.dto.requests import AddMovieRequest
+from watchapedia.app.movie.dto.requests import AddMovieRequest, UpdateMovieRequest
 from watchapedia.app.movie.dto.responses import MovieDataResponse
 
 movie_router = APIRouter()
@@ -37,4 +37,22 @@ def get_movie(
     movie_id: int,
     movie_service: Annotated[MovieService, Depends()]
 ) -> MovieDataResponse:
-    return movie_service.get_movie_by_movie_id(movie_id)
+    return movie_service.search_movie(movie_id)
+
+@movie_router.patch("/{movie_id}",
+                status_code=200,
+                summary="영화 정보 업데이트",
+                description="특정 영화의 데이터를 업데이트 한 후 성공 시 'Success'를 반환합니다. 업데이트 가능한 항목은 synopsis, grade, poster_url, backdrop_url 입니다.")
+def update_movie(
+    movie_id: int,
+    update_movie_request: UpdateMovieRequest,
+    movie_service: Annotated[MovieService, Depends()]
+):
+    movie_service.update_movie(
+        movie_id,
+        update_movie_request.synopsis,
+        update_movie_request.grade,
+        update_movie_request.poster_url,
+        update_movie_request.backdrop_url
+    )
+    return 'Success'

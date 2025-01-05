@@ -4,7 +4,7 @@ from watchapedia.app.genre.repository import GenreRepository
 from watchapedia.app.country.repository import CountryRepository
 from watchapedia.app.participant.repository import ParticipantRepository
 from fastapi import Depends
-from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundError
+from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundError, InvalidUpdateError
 from watchapedia.app.movie.models import Movie
 from watchapedia.app.movie.dto.requests import AddParticipantsRequest
 from watchapedia.app.movie.dto.responses import MovieDataResponse, ParticipantsDataResponse
@@ -67,11 +67,28 @@ class MovieService():
             # chart update 로직 추가?
             raise MovieAlreadyExistsError()
     
-    def get_movie_by_movie_id(self, movie_id: int):
+    def search_movie(self, movie_id: int):
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
         if movie is None:
             raise MovieNotFoundError()
         return self._process_movie_response(movie)
+    
+    def update_movie(
+        self, movie_id: int, synopsis: str | None, grade: str | None, poster_url: str | None, backdrop_url: str | None
+    ) -> None:
+        movie = self.movie_repository.get_movie_by_movie_id(movie_id)
+        if not movie:
+            raise MovieNotFoundError()
+        if not any([synopsis, grade, poster_url, backdrop_url]):
+            raise InvalidUpdateError()
+        self.movie_repository.update_movie(
+            movie=movie,
+            synopsis=synopsis,
+            grade=grade,
+            poster_url=poster_url,
+            backdrop_url=backdrop_url
+        )
+        
     
     def get_movie():
         ...

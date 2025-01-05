@@ -38,6 +38,20 @@ class MovieRepository():
         self.session.flush()
         return movie
     
+    def update_movie(
+        self, movie: Movie, synopsis: str | None, grade: str | None, poster_url: str | None, backdrop_url: str | None
+    ) -> None:
+        if synopsis:
+            movie.synopsis = synopsis
+        if grade:
+            movie.grade = grade
+        if poster_url:
+            movie.poster_url = poster_url
+        if backdrop_url:
+            movie.backdrop_url = backdrop_url
+        
+        self.session.flush()
+            
     def add_movie_participant(self, movie: Movie, participant: Participant, role: str) -> None:
         movie_participant = MovieParticipant(movie.id, participant.id, role)
         self.session.add(movie_participant)

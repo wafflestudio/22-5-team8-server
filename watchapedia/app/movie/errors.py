@@ -7,3 +7,7 @@ class MovieAlreadyExistsError(HTTPException):
 class MovieNotFoundError(HTTPException):
     def __init__(self):
         super().__init__(status_code=404, detail="Movie Not Found")
+
+class InvalidUpdateError(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=400, detail="Invalid Update")
