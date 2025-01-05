@@ -4,8 +4,7 @@ from watchapedia.app.genre.repository import GenreRepository
 from watchapedia.app.country.repository import CountryRepository
 from watchapedia.app.participant.repository import ParticipantRepository
 from fastapi import Depends
-from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
-from watchapedia.app.movie.errors import MovieAlreadyExistsError
+from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundError
 from watchapedia.app.movie.models import Movie
 from watchapedia.app.movie.dto.requests import AddParticipantsRequest
 from watchapedia.app.movie.dto.responses import MovieDataResponse, ParticipantsDataResponse
@@ -61,19 +60,40 @@ class MovieService():
                 participant_data.name, participant_data.profile_url, participant_data.role, movie
             )
         
+        return self._process_movie_response(movie)
+
+    def raise_if_movie_exist(self, title: str, year: int, running_time: int) -> None:
+        if self.movie_repository.get_movie(title, year, running_time) is not None:
+            # chart update 로직 추가?
+            raise MovieAlreadyExistsError()
+    
+    def get_movie_by_movie_id(self, movie_id: int):
+        movie = self.movie_repository.get_movie_by_movie_id(movie_id)
+        if movie is None:
+            raise MovieNotFoundError()
+        return self._process_movie_response(movie)
+    
+    def get_movie():
+        ...
+        
+    def _process_movie_response(self, movie: Movie) -> MovieDataResponse:
         return MovieDataResponse(
             id=movie.id,
-            title=title,
-            original_title=original_title,
-            year=year,
-            genres=genres,
-            countries=countries,
-            synopsis=synopsis,
-            average_rating=None,
-            running_time=running_time,
-            grade=grade,
-            poster_url=poster_url,
-            backdrop_url=backdrop_url,
+            title=movie.title,
+            original_title=movie.original_title,
+            year=movie.year,
+            genres=[
+                genre.name for genre in movie.genres    
+            ],
+            countries=[
+                country.name for country in movie.countries
+            ],
+            synopsis=movie.synopsis,
+            average_rating=movie.average_rating,
+            running_time=movie.running_time,
+            grade=movie.grade,
+            poster_url=movie.poster_url,
+            backdrop_url=movie.backdrop_url,
             participants=[
                 ParticipantsDataResponse(
                     id=participant.participant_id,
@@ -84,16 +104,5 @@ class MovieService():
                 for participant in movie.movie_participants
             ]
         )
-
-    def raise_if_movie_exist(self, title: str, year: int, running_time: int) -> None:
-        if self.movie_repository.get_movie(title, year, running_time) is not None:
-            # chart update 로직 추가?
-            raise MovieAlreadyExistsError()
-    
-    def get_movie_by_movie_id():
-        ...
-    
-    def get_movie():
-        ...
     
     

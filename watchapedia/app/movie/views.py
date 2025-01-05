@@ -28,3 +28,13 @@ def add_movie(
         add_movie_request.countries,
         add_movie_request.participants
     )
+
+@movie_router.get("/{movie_id}",
+                status_code=200,
+                summary="영화 조회",
+                description="영화 id로 DB를 조회하여 성공 시 영화 정보를 반환합니다.")
+def get_movie(
+    movie_id: int,
+    movie_service: Annotated[MovieService, Depends()]
+) -> MovieDataResponse:
+    return movie_service.get_movie_by_movie_id(movie_id)
