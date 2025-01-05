@@ -1,0 +1,55 @@
+name: deploy to EC2 using docker
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [closed]  # PR이 닫힐 때(머지 포함)
+
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+  DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
+  AWS_HOST: ${{ secrets.AWS_HOST }}
+  AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
+  AWS_USER: ${{ secrets.AWS_USER }}
+  AWS_SSH_PORT: ${{ secrets.AWS_SSH_PORT }}
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3  # 레포에 있는 코드를 actions 작업환경으로 가져오기
+
+      - name: Login to Docker Hub
+        run: |
+          docker login -u ${{ env.DOCKER_HUB_USERNAME }} -p ${{ env.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build . -t ${{ env.DOCKER_REPO }}:latest
+          docker push ${{ env.DOCKER_REPO }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: EC2 Docker Deploy
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.AWS_HOST }}
+          username: ${{ env.AWS_USER }}
+          key: ${{ env.AWS_SSH_KEY }}
+          port: ${{ env.AWS_SSH_PORT }}
+          script: |
+            cd watchapedia/
+            sudo docker compose down
+            sudo docker compose pull
+            sudo docker compose up -d
