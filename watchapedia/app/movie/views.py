@@ -31,7 +31,7 @@ def add_movie(
         add_movie_request.participants
     )
 
-@movie_router.post("",
+@movie_router.post("/list",
                 status_code=201,
                 summary="영화 리스트 추가",
                 description="[유저영역 아님] 여러 영화 정보를 받아 DB에 영화들을을 추가하고 성공 시 저장된 정보를 반환합니다. (EC2에서 크롤링이 작동하지 않아 만든 메서드입니다.)")
@@ -91,7 +91,7 @@ def update_movie(
 @movie_router.get("",
                 status_code=200,
                 summary="영화 리스트 조회",
-                description="주어진 조건에 따른 영화 리스트를 반환합니다. 가능한 조건은 [제목/차트이름/최소별점/최대별점/장르/국가] 입니다. 장르와 국가는 여러 개 입력할 수 있습니다. 차트 영화 정보는 오름차순으로 제공합니다.")
+                description="주어진 조건에 따른 영화 리스트를 반환합니다. 가능한 조건은 [제목/차트이름/최소별점/최대별점/장르/국가] 입니다. 장르와 국가는 여러 개 입력할 수 있습니다. 차트 영화 정보는 낮은 순위부터 제공합니다.")
 def search_movie_list(
     movie_service: Annotated[MovieService, Depends()],
     title: str | None = None,

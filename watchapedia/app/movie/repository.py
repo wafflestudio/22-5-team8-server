@@ -119,9 +119,9 @@ class MovieRepository():
             stmt = stmt.join(Movie.movie_participants).where(MovieParticipant.participant_id == participant_id)
 
         
-        # 최신 순으로 정렬 - 1위부터 제공
+        # 최신 순으로 정렬 - 역순으로
         if chart_type:
-            stmt = stmt.order_by(Chart.updated_at.desc(), Chart.rank.asc())
+            stmt = stmt.order_by(Chart.updated_at.desc(), Chart.rank.desc())
     
         # 반환 개수 제한
         limit = type_dict.get(chart_type, None)

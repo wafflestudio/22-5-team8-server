@@ -27,10 +27,13 @@ class ParticipantRepository():
             participant = Participant(name=name, profile_url=profile_url)
             self.session.add(participant)
             self.session.flush()
-        
-        movie_participant = MovieParticipant(movie_id=movie.id, participant_id=participant.id, role=role)
-        self.session.add(movie_participant)
-        self.session.flush()
+
+        # MovieParticipant가 중복되는 경우가 존재
+        movie_participant = self.get_movie_participant(movie.id, participant.id)
+        if not movie_participant:
+            movie_participant = MovieParticipant(movie_id=movie.id, participant_id=participant.id, role=role)
+            self.session.add(movie_participant)
+            self.session.flush()
     
     def get_participant(self, name: str, profile_url: str | None) -> Participant | None:
         get_participant_query =  select(Participant).filter(
@@ -38,6 +41,13 @@ class ParticipantRepository():
             & (Participant.name == name)
         )
         return self.session.scalar(get_participant_query)
+    
+    def get_movie_participant(self, movie_id: int, participant_id: int) -> MovieParticipant | None:
+        get_movie_participant_query = select(MovieParticipant).filter(
+            (MovieParticipant.movie_id == movie_id)
+            & (MovieParticipant.participant_id == participant_id)
+        )
+        return self.session.scalar(get_movie_participant_query)
         
     
     def update_participant(self, biography: str) -> None:
