@@ -6,7 +6,7 @@ from watchapedia.app.participant.repository import ParticipantRepository
 from fastapi import Depends
 from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundError, InvalidFormatError
 from watchapedia.app.movie.models import Movie
-from watchapedia.app.movie.dto.requests import AddParticipantsRequest
+from watchapedia.app.movie.dto.requests import AddParticipantsRequest, AddMovieListRequest
 from watchapedia.app.movie.dto.responses import MovieDataResponse, ParticipantsDataResponse
 
 class MovieService():
@@ -139,6 +139,27 @@ class MovieService():
         )
         return [ self._process_movie_response(movie) for movie in movies ]
         
+    def add_movie_list(self, movie_list_request: list[AddMovieListRequest]) -> list[MovieDataResponse]:
+        movie_response_list = []
+        for movie_request in movie_list_request:
+            movie_response = self.add_movie(
+                movie_request.title,
+                movie_request.original_title,
+                movie_request.year,
+                movie_request.synopsis,
+                movie_request.running_time,
+                movie_request.grade,
+                movie_request.poster_url,
+                movie_request.backdrop_url,
+                movie_request.genres,
+                movie_request.countries,
+                movie_request.participants,
+                movie_request.chart_type,
+                movie_request.rank,
+            )
+            movie_response_list.append(movie_response)
+        return movie_response_list
+    
     def _process_movie_response(self, movie: Movie) -> MovieDataResponse:
         return MovieDataResponse(
             id=movie.id,

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from watchapedia.common.errors import InvalidFieldFormatError
 from typing import Annotated
@@ -56,3 +57,18 @@ class UpdateMovieRequest(BaseModel):
     average_rating: float | None = None
     poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
     backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
+
+class AddMovieListRequest(BaseModel):
+    title: str
+    original_title: str
+    year: Annotated[int, AfterValidator(validate_year)]
+    synopsis: str | None = None
+    running_time: Annotated[int, AfterValidator(validate_running_time)]
+    grade: Annotated[str | None, AfterValidator(validate_grade)] = None
+    poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
+    backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
+    genres: list[str]
+    countries: list[str]
+    chart_type: str | None = None
+    rank: int | None = None
+    participants: list[AddParticipantsRequest]
