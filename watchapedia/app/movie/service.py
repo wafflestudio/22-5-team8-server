@@ -34,8 +34,8 @@ class MovieService():
         genres: list[str],
         countries: list[str],
         participants: list[AddParticipantsRequest],
-        chart_type: str | None,
-        rank: int | None
+        chart_type: str | None = None,
+        rank: int | None = None
     ) -> MovieDataResponse:
         
         movie = self.raise_if_movie_exist(title, year, running_time, chart_type, rank)

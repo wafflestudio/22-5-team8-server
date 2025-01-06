@@ -2,6 +2,9 @@ from pydantic import BaseModel
 from watchapedia.common.errors import InvalidFieldFormatError
 from typing import Annotated
 from pydantic.functional_validators import AfterValidator
+import re
+
+URL_PATTERN = re.compile(r"(https?://)?(www.)?[-a-zA-Z0-9@:%.+~#=]{2,256}.[a-z]{2,6}\b([-a-zA-Z0-9@:%+.~#?&//=]*)")
 
 def validate_year(value: int | None) -> str:
     # 최초의 영화는 '열차의 도착'이란 프랑스 영화로, 1895년 작이다.
@@ -20,6 +23,13 @@ def validate_grade(value: str | None) -> str:
         raise InvalidFieldFormatError("grade")
     return value
 
+def validate_url(value: str | None) -> str:
+    if value is None:
+        return value
+    if not re.match(URL_PATTERN, value):
+        raise InvalidFieldFormatError("url")
+    return value
+
     
 
 class AddParticipantsRequest(BaseModel):
@@ -34,8 +44,8 @@ class AddMovieRequest(BaseModel):
     synopsis: str | None = None
     running_time: Annotated[int, AfterValidator(validate_running_time)]
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
-    poster_url: str | None = None
-    backdrop_url: str | None = None
+    poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
+    backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
     genres: list[str]
     countries: list[str]
     participants: list[AddParticipantsRequest]
@@ -44,5 +54,5 @@ class UpdateMovieRequest(BaseModel):
     synopsis: str | None = None
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
     average_rating: float | None = None
-    poster_url: str | None = None
-    backdrop_url: str | None = None
+    poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
+    backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
