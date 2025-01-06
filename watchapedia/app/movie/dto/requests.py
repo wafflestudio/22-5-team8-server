@@ -20,7 +20,7 @@ def validate_running_time(value: int | None) -> int:
     
 def validate_grade(value: str | None) -> str:
     allowed_grades = {"전체", "12세", "15세", "청불"}
-    if value is None or value not in allowed_grades:
+    if value is not None and value not in allowed_grades:
         raise InvalidFieldFormatError("grade")
     return value
 
