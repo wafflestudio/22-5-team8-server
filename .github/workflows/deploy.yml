@@ -3,9 +3,6 @@ name: deploy to EC2 using docker
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
-    types: [closed]  # PR이 닫힐 때(머지 포함)
 
 
 env:
