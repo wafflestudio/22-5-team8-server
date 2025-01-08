@@ -22,10 +22,6 @@ class CommentService:
         if review is None :
             raise ReviewNotFoundError()
 
-        comment = self.comment_repository.get_comment_by_user_and_review(user_id, review_id)
-        if comment is not None :
-            raise RedundantCommentError()
-
         new_comment = self.comment_repository.create_comment(user_id=user_id, review_id=review_id,
                                                     content=content, created_at=datetime.now())
 
