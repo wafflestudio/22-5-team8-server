@@ -39,7 +39,7 @@ class Movie(Base):
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     synopsis: Mapped[str] = mapped_column(String(1000), nullable=False, default="등록된 소개글이 없습니다.")
     average_rating: Mapped[float | None] = mapped_column(Float, default=None)
-    running_time: Mapped[int] = mapped_column(Integer, nullable=False)
+    running_time: Mapped[int | None] = mapped_column(Integer)
     grade: Mapped[str | None] = mapped_column(String(20))
     poster_url: Mapped[str | None] = mapped_column(String(500))
     backdrop_url: Mapped[str | None] = mapped_column(String(500))

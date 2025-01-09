@@ -17,7 +17,7 @@ class MovieDataResponse(BaseModel):
     synopsis: str
     average_rating: float | None
     ratings_count: int
-    running_time: int
+    running_time: int | None
     grade: str | None
     poster_url: str | None
     backdrop_url: str | None

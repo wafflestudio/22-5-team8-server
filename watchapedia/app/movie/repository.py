@@ -21,7 +21,7 @@ class MovieRepository():
         original_title: str,
         year: int, 
         synopsis: str, 
-        running_time: int, 
+        running_time: int | None, 
         grade: str | None, 
         poster_url: str | None, 
         backdrop_url: str | None
@@ -46,6 +46,7 @@ class MovieRepository():
         movie: Movie, 
         synopsis: str | None, 
         grade: str | None, 
+        running_time: int | None,
         average_rating: float | None, 
         poster_url: str | None, 
         backdrop_url: str | None
@@ -54,6 +55,8 @@ class MovieRepository():
             movie.synopsis = synopsis
         if grade:
             movie.grade = grade
+        if running_time:
+            movie.running_time = running_time
         if average_rating:
             movie.average_rating = average_rating
         if poster_url:
@@ -145,7 +148,7 @@ class MovieRepository():
         self.session.flush()
     
     # 동명의 영화가 다수 존재. 하나로 특정하려면 다른 필드와 조합해서 검색
-    def get_movie(self, title: str, year: int, running_time: int) -> Movie | None:
+    def get_movie(self, title: str, year: int, running_time: int | None) -> Movie | None:
         get_movie_query = select(Movie).filter(
             (Movie.title==title)
             & (Movie.year==year)
