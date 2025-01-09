@@ -174,6 +174,7 @@ class MovieService():
             ],
             synopsis=movie.synopsis,
             average_rating=movie.average_rating,
+            ratings_count=len(movie.reviews),
             running_time=movie.running_time,
             grade=movie.grade,
             poster_url=movie.poster_url,
