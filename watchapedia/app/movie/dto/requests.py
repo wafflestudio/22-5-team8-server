@@ -14,7 +14,7 @@ def validate_year(value: int | None) -> str:
     return value
 
 def validate_running_time(value: int | None) -> int:
-    if value is None or value < 1 or value > 900:
+    if value is not None and (value < 1 or value > 900):
         raise InvalidFieldFormatError("running time")
     return value
     
@@ -43,7 +43,7 @@ class AddMovieRequest(BaseModel):
     original_title: str
     year: Annotated[int, AfterValidator(validate_year)]
     synopsis: str | None = None
-    running_time: Annotated[int, AfterValidator(validate_running_time)]
+    running_time: Annotated[int | None, AfterValidator(validate_running_time)] = None
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
     poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
     backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
@@ -54,6 +54,7 @@ class AddMovieRequest(BaseModel):
 class UpdateMovieRequest(BaseModel):
     synopsis: str | None = None
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
+    running_time: Annotated[int | None, AfterValidator(validate_running_time)] = None
     average_rating: float | None = None
     poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
     backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None
@@ -63,7 +64,7 @@ class AddMovieListRequest(BaseModel):
     original_title: str
     year: Annotated[int, AfterValidator(validate_year)]
     synopsis: str | None = None
-    running_time: Annotated[int, AfterValidator(validate_running_time)]
+    running_time: Annotated[int | None, AfterValidator(validate_running_time)]
     grade: Annotated[str | None, AfterValidator(validate_grade)] = None
     poster_url: Annotated[str | None, AfterValidator(validate_url)] = None
     backdrop_url: Annotated[str | None, AfterValidator(validate_url)] = None

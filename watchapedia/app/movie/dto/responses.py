@@ -16,7 +16,8 @@ class MovieDataResponse(BaseModel):
     countries: list[str]
     synopsis: str
     average_rating: float | None
-    running_time: int
+    ratings_count: int
+    running_time: int | None
     grade: str | None
     poster_url: str | None
     backdrop_url: str | None

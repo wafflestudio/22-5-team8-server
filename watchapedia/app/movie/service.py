@@ -27,7 +27,7 @@ class MovieService():
         original_title: str,
         year: int, 
         synopsis: str | None, 
-        running_time: int, 
+        running_time: int | None, 
         grade: str | None,
         poster_url: str | None,
         backdrop_url: str | None,
@@ -72,7 +72,7 @@ class MovieService():
         return self._process_movie_response(movie)
 
     def raise_if_movie_exist(
-        self, title: str, year: int, running_time: int, chart_type: str | None, rank: int | None
+        self, title: str, year: int, running_time: int | None, chart_type: str | None, rank: int | None
     ) -> Movie | None:
         """
         이미 해당 영화가 존재하고, 차트 정보가 업데이트 되었을 때 Movie 객체 반환.
@@ -98,6 +98,7 @@ class MovieService():
         movie_id: int, 
         synopsis: str | None, 
         grade: str | None, 
+        running_time: int | None,
         average_rating: float | None, 
         poster_url: str | None, 
         backdrop_url: str | None
@@ -105,12 +106,13 @@ class MovieService():
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
         if not movie:
             raise MovieNotFoundError()
-        if not any([synopsis, grade, average_rating, poster_url, backdrop_url]):
+        if not any([synopsis, grade, running_time, average_rating, poster_url, backdrop_url]):
             raise InvalidFormatError()
         self.movie_repository.update_movie(
             movie=movie,
             synopsis=synopsis,
             grade=grade,
+            running_time=running_time,
             average_rating=average_rating,
             poster_url=poster_url,
             backdrop_url=backdrop_url
@@ -174,6 +176,7 @@ class MovieService():
             ],
             synopsis=movie.synopsis,
             average_rating=movie.average_rating,
+            ratings_count=len(movie.reviews),
             running_time=movie.running_time,
             grade=movie.grade,
             poster_url=movie.poster_url,

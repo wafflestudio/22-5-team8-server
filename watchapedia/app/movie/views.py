@@ -66,6 +66,7 @@ def update_movie(
         movie_id,
         update_movie_request.synopsis,
         update_movie_request.grade,
+        update_movie_request.running_time,
         update_movie_request.average_rating,
         update_movie_request.poster_url,
         update_movie_request.backdrop_url
