@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, Float, ForeignKey
+from sqlalchemy import Integer, String, Float, ForeignKey, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from watchapedia.database.common import Base
@@ -16,6 +16,8 @@ class Review(Base):
     rating: Mapped[float] = mapped_column(Float, nullable=False)
     likes_count: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    spoiler: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False)
 
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("user.id"), nullable=False
