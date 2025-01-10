@@ -23,7 +23,7 @@ def get_participant_profile(
 @participant_router.get('/{participant_id}/movies',
                     status_code=200, 
                     summary="인물과 관련된 영화 출력", 
-                    description="인물 id를 받아 해당 인물과 관련된 영화들의 정보를 반환합니다.",
+                    description="인물 id를 받아 해당 인물과 관련된 영화들의 정보를 개봉연도가 높은 순서로로 반환합니다.",
                     response_model=list[ParticipantDataResponse]
                     )
 def get_participant_movie(

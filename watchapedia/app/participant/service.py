@@ -34,14 +34,17 @@ class ParticipantService():
             raise ParticipantNotFoundError()
         participant_info = {"감독": [], "출연": []}
         roles = self.get_participant_roles(participant_id)
+        casts = set()
         for role in roles:
-            cast = role.split("|")[0].strip()
+            casts.add(role.split("|")[0].strip())
+        for cast in casts:
             movies = self.participant_repository.get_participant_movies(participant_id, cast)
             if cast == "감독":
                 participant_info["감독"].extend(self._process_movies(movies, cast))
             elif cast in ["주연", "조연", "단역"]:
                 participant_info["출연"].extend(self._process_movies(movies, cast))
-        print(participant_info)
+        participant_info["감독"] = sorted(participant_info["감독"], key=lambda x: x.year, reverse=True) # 연도 내림차순 정렬
+        participant_info["출연"] = sorted(participant_info["출연"], key=lambda x: x.year, reverse=True) # 연도 내림차순 정렬
         return [self._process_participants(role=cast, movies=movies) for cast, movies in participant_info.items()]
 
     
@@ -52,7 +55,6 @@ class ParticipantService():
         if not any([name, profile_url, biography]):
             raise InvalidFormatError()
         self.participant_repository.update_participant(participant, name, profile_url, biography)
-
 
         
     def get_participant_roles(self, participant_id: int):
