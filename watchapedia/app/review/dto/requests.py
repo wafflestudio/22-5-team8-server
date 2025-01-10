@@ -19,10 +19,22 @@ def validate_rating(value: float) -> float:
         raise InvalidFieldFormatError("rating")
     return value
 
+def validate_status(value: str | None) -> str | None:
+    # status는 None이거나 "WatchList"거나 "Watching"이어야 함
+    if value is None:
+        return value
+    if value not in ["WatchList", "Watching", ""] :
+        raise InvalidFieldFormatError("status")
+    return value
+
 class ReviewCreateRequest(BaseModel):
     content: Annotated[str | None, AfterValidator(validate_content)] = None
     rating: Annotated[float, AfterValidator(validate_rating)]
+    spoiler: Annotated[bool, AfterValidator(validate_rating)]
+    status: Annotated[str | None, AfterValidator(validate_status)] = None
 
 class ReviewUpdateRequest(BaseModel):
     content: Annotated[str | None, AfterValidator(validate_content)] = None
     rating: Annotated[float | None, AfterValidator(validate_rating)] = None
+    spoiler: Annotated[bool | None, AfterValidator(validate_rating)] = None
+    status: Annotated[str | None, AfterValidator(validate_status)] = None

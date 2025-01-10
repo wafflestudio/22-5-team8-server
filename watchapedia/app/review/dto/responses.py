@@ -12,4 +12,6 @@ class ReviewResponse(BaseModel):
     rating: float
     likes_count: int
     created_at: datetime
+    spoiler: bool
+    status: str | None
 
