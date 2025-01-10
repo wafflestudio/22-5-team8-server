@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from watchapedia.app.participant.models import Participant
 
 class MovieDataResponse(BaseModel):
     id: int
@@ -11,3 +12,20 @@ class MovieDataResponse(BaseModel):
 class ParticipantDataResponse(BaseModel):
     cast: str
     movies: list[MovieDataResponse]
+
+class ParticipantProfileResponse(BaseModel):
+    id: int
+    name: str
+    profile_url: str | None
+    roles: list[str]
+    biography: str | None
+
+    @staticmethod
+    def from_entity(participant: Participant, roles: list[str]) -> "ParticipantProfileResponse":
+        return ParticipantProfileResponse(
+            id=participant.id,
+            name=participant.name,
+            profile_url=participant.profile_url,
+            roles=roles,
+            biography=participant.biography
+        )
