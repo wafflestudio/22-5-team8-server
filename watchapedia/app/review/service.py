@@ -18,7 +18,7 @@ class ReviewService:
         self.movie_repository = movie_repository
         self.review_repository = review_repository
 
-    def create_review(self, user_id: int, movie_id: int, content: str,
+    def create_review(self, user_id: int, movie_id: int, content: str | None,
                     rating: float | None, spoiler: bool, status: str | None
     ) -> ReviewResponse:
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)

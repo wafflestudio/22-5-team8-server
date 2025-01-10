@@ -29,12 +29,12 @@ def validate_status(value: str | None) -> str | None:
 
 class ReviewCreateRequest(BaseModel):
     content: Annotated[str | None, AfterValidator(validate_content)] = None
-    rating: Annotated[float, AfterValidator(validate_rating)]
-    spoiler: Annotated[bool, AfterValidator(validate_rating)]
+    rating: Annotated[float | None, AfterValidator(validate_rating)] = None
+    spoiler: bool
     status: Annotated[str | None, AfterValidator(validate_status)] = None
 
 class ReviewUpdateRequest(BaseModel):
     content: Annotated[str | None, AfterValidator(validate_content)] = None
     rating: Annotated[float | None, AfterValidator(validate_rating)] = None
-    spoiler: Annotated[bool | None, AfterValidator(validate_rating)] = None
+    spoiler: bool | None
     status: Annotated[str | None, AfterValidator(validate_status)] = None

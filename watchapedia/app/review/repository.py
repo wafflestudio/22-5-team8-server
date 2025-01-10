@@ -20,7 +20,7 @@ class ReviewRepository():
 
         return self.session.scalar(get_review_query)
 
-    def create_review(self, user_id: int, movie_id: int, content: str, rating: float,
+    def create_review(self, user_id: int, movie_id: int, content: str, rating: float | None,
                     created_at, spoiler: bool, status: str | None
     ) -> Review:
         review = Review(

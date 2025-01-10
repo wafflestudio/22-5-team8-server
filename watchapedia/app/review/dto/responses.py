@@ -9,7 +9,7 @@ class ReviewResponse(BaseModel):
     user_name: str
     movie_id: int
     content: str | None
-    rating: float
+    rating: float | None
     likes_count: int
     created_at: datetime
     spoiler: bool

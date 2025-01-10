@@ -13,7 +13,7 @@ class Review(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     content: Mapped[str] = mapped_column(String(500), nullable=True)
-    rating: Mapped[float] = mapped_column(Float, nullable=False)
+    rating: Mapped[float] = mapped_column(Float, nullable=True)
     likes_count: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     spoiler: Mapped[bool] = mapped_column(Boolean, nullable=False)
