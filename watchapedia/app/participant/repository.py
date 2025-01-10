@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, distinct
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
@@ -42,6 +42,10 @@ class ParticipantRepository():
         )
         return self.session.scalar(get_participant_query)
     
+    def get_participant_by_id(self, participant_id: int) -> Participant | None:
+        get_participant_query = select(Participant).filter(Participant.id == participant_id)
+        return self.session.scalar(get_participant_query)
+    
     def get_movie_participant(self, movie_id: int, participant_id: int) -> MovieParticipant | None:
         get_movie_participant_query = select(MovieParticipant).filter(
             (MovieParticipant.movie_id == movie_id)
@@ -50,5 +54,24 @@ class ParticipantRepository():
         return self.session.scalar(get_movie_participant_query)
         
     
-    def update_participant(self, biography: str) -> None:
-        ...
+    def update_participant(self, participant: Participant, name: str | None, profile_url : str | None, biography: str | None ) -> None:
+        if name:
+            participant.name = name
+        if profile_url:
+            participant.profile_url = profile_url
+        if biography:
+            participant.biography = biography
+        self.session.flush()
+
+    def get_participant_roles(self, participant_id: int) -> list[str]:
+        get_participant_roles_query = select(distinct(MovieParticipant.role)).filter(
+            MovieParticipant.participant_id == participant_id
+        )
+        return self.session.scalars(get_participant_roles_query).all()
+    
+    def get_participant_movies(self, participant_id: int, cast: str) -> list[Movie]:
+        get_participant_movies_query = select(Movie).join(MovieParticipant).filter(
+            (MovieParticipant.participant_id == participant_id)
+            & (MovieParticipant.role.contains(cast))
+        )
+        return self.session.scalars(get_participant_movies_query).all()
