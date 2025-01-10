@@ -19,9 +19,9 @@ class ParticipantService():
         # 감독과 배우 구분
         roles = set()
         for role in tmp:
-            if role == "감독":
+            if "감독" in role:
                 roles.add("감독")
-            elif role == "주연" or role == "조연" or role == "단역":
+            elif "주연"  in role or "조연" in role or "단역" in role:
                 roles.add("배우")
         if participant is None:
             raise ParticipantNotFoundError()
