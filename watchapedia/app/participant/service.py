@@ -6,6 +6,7 @@ from watchapedia.common.errors import InvalidFormatError
 from watchapedia.app.participant.dto.responses import ParticipantDataResponse, MovieDataResponse, ParticipantProfileResponse
 from watchapedia.app.movie.models import Movie
 from watchapedia.app.participant.models import Participant
+from collections import defaultdict
 
 class ParticipantService():
     def __init__(self,
@@ -31,16 +32,18 @@ class ParticipantService():
         participant = self.participant_repository.get_participant_by_id(participant_id)
         if participant is None:
             raise ParticipantNotFoundError()
-        participant_info = {}
+        participant_info = {"감독": [], "출연": []}
         roles = self.get_participant_roles(participant_id)
         for role in roles:
-            cast = role.split("|")[0].strip() # role에서 "|"로 구분된 문자열에서 앞에 있는 문자열만 가져옴
+            cast = role.split("|")[0].strip()
             movies = self.participant_repository.get_participant_movies(participant_id, cast)
             if cast == "감독":
-                participant_info["감독"] = self._process_movies(movies, cast)
-            elif cast == "주연" or cast == "조연" or cast == "단역":
-                participant_info["출연"] = self._process_movies(movies, cast)
+                participant_info["감독"].extend(self._process_movies(movies, cast))
+            elif cast in ["주연", "조연", "단역"]:
+                participant_info["출연"].extend(self._process_movies(movies, cast))
+        print(participant_info)
         return [self._process_participants(role=cast, movies=movies) for cast, movies in participant_info.items()]
+
     
     def update_participant(self, participant_id: int, name: str | None, profile_url: str | None, biography: str | None):
         participant = self.participant_repository.get_participant_by_id(participant_id)
