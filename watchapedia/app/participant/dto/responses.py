@@ -7,10 +7,11 @@ class MovieDataResponse(BaseModel):
     year: int
     average_rating: float | None
     poster_url: str | None
+    cast : str | None
 
 
 class ParticipantDataResponse(BaseModel):
-    cast: str
+    role: str
     movies: list[MovieDataResponse]
 
 class ParticipantProfileResponse(BaseModel):
