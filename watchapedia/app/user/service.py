@@ -9,6 +9,7 @@ from watchapedia.auth.utils import create_access_token, create_refresh_token, de
 from watchapedia.auth.settings import JWT_SETTINGS
 from datetime import datetime
 from uuid import uuid4
+from watchapedia.app.user.dto.responses import UserResponse
 
 class UserService:
     def __init__(self, user_repository: Annotated[UserRepository, Depends()]) -> None:
@@ -42,6 +43,11 @@ class UserService:
     def get_user_by_username(self, username: str) -> User | None:
         return self.user_repository.get_user_by_username(username)
     
+    def search_user_list(self, username: str) -> list[User] | None:
+        users = self.user_repository.search_user_list(username)
+        return [UserResponse(
+                username=user.username) for user in users]
+
     def validate_access_token(self, token: str) -> dict:
         payload = decode_token(token)
         if payload['typ'] != 'access':
