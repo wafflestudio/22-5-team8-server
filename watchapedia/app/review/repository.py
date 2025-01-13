@@ -20,14 +20,18 @@ class ReviewRepository():
 
         return self.session.scalar(get_review_query)
 
-    def create_review(self, user_id: int, movie_id: int, content: str, rating: float, created_at) -> Review:
+    def create_review(self, user_id: int, movie_id: int, content: str | None, rating: float | None,
+                    created_at, spoiler: bool, status: str | None
+    ) -> Review:
         review = Review(
             user_id=user_id,
             movie_id=movie_id,
             content=content,
             rating=rating,
             likes_count=0,
-            created_at=created_at
+            created_at=created_at,
+            spoiler=spoiler,
+            status=status
         )
         self.session.add(review)
         self.session.flush()
@@ -36,19 +40,31 @@ class ReviewRepository():
 
         return review
 
-    def update_review(self, review, content: str | None, rating: float | None) -> Review:
+    def update_review(self, review, content: str | None, rating: float | None,
+                    spoiler: bool | None, status: str | None
+    ) -> Review:
         if content is not None :
             review.content = content
 
         if rating is not None :
             review.rating = rating
+
+        if spoiler is not None :
+            review.spoiler = spoiler
+
+        if status is not None :
+            review.status = status
         
         self.session.flush()
 
         return review
 
-    def get_reviews(self, movie_id: int) -> Sequence[Review]:
+    def get_reviews_by_movie_id(self, movie_id: int) -> Sequence[Review]:
         reviews_list_query = select(Review).where(Review.movie_id == movie_id)
+        return self.session.scalars(reviews_list_query).all()
+
+    def get_reviews_by_user_id(self, user_id: int) -> Sequence[Review]:
+        reviews_list_query = select(Review).where(Review.user_id == user_id)
         return self.session.scalars(reviews_list_query).all()
 
     def get_review_by_review_id(self, review_id: int) -> Review:

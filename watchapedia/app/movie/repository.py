@@ -163,7 +163,14 @@ class MovieRepository():
     def update_average_rating(self, movie: Movie) -> None:
         reviews = movie.reviews
         total_rating = 0.0
+        rating_num = 0
+
         for review in reviews :
-            total_rating += review.rating
-        movie.average_rating = round(total_rating / len(reviews), 1)
+            if review.rating is not None :
+                total_rating += review.rating
+                rating_num += 1
+
+        if rating_num >= 1 :
+            movie.average_rating = round(total_rating / rating_num, 1)
+
         self.session.flush()
