@@ -11,8 +11,12 @@ if TYPE_CHECKING:
 class MovieCollection(Base):
     __tablename__ = 'movie_collection'
 
-    movie_id: Mapped[int] = mapped_column(Integer, ForeignKey("movie.id"), nullable=False, primary_key=True)
-    collection_id: Mapped[int] = mapped_column(Integer, ForeignKey("collection.id"), nullable=False, primary_key=True)
+    movie_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("movie.id", ondelete="CASCADE"), nullable=False, primary_key=True
+    )
+    collection_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("collection.id", ondelete="CASCADE"), nullable=False, primary_key=True
+    )
 
 class CollectionComment(Base):
     __tablename__ = 'collection_comment'
@@ -23,12 +27,12 @@ class CollectionComment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user: Mapped["User"] = relationship("User", back_populates="collection_comments")
 
     collection_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("collection.id"), nullable=False
+        Integer, ForeignKey("collection.id", ondelete="CASCADE"), nullable=False
     )
     collection: Mapped["Collection"] = relationship("Collection", back_populates="comments")
 
@@ -42,20 +46,24 @@ class Collection(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user: Mapped["User"] = relationship("User", back_populates="collections")
     
-    movies: Mapped[list["Movie"]] = relationship(secondary="movie_collection", back_populates="collections")
-    comments: Mapped[list["CollectionComment"]] = relationship("CollectionComment", back_populates="collection")
+    movies: Mapped[list["Movie"]] = relationship(
+        secondary="movie_collection", back_populates="collections", cascade="all, delete"
+    )
+    comments: Mapped[list["CollectionComment"]] = relationship(
+        "CollectionComment", back_populates="collection", cascade="all, delete, delete-orphan"
+    )
 
 class UserLikesCollectionComment(Base):
     __tablename__ = 'user_likes_collection_comment'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     collection_comment_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("collection_comment.id"), nullable=False
+        Integer, ForeignKey("collection_comment.id", ondelete="CASCADE"), nullable=False
     )

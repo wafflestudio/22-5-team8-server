@@ -19,8 +19,12 @@ class User(Base):
     
     reviews: Mapped[list["Review"]] = relationship("Review", back_populates="user")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user")
-    collections: Mapped[list["Collection"]] = relationship("Collection", back_populates="user")
-    collection_comments: Mapped[list["CollectionComment"]] = relationship("CollectionComment", back_populates="user")
+    collections: Mapped[list["Collection"]] = relationship(
+        "Collection", back_populates="user", cascade="all, delete, delete-orphan"
+    )
+    collection_comments: Mapped[list["CollectionComment"]] = relationship(
+        "CollectionComment", back_populates="user", cascade="all, delete, delete-orphan"
+    )
     
 class BlockedToken(Base):
     __tablename__ = "blocked_token"
