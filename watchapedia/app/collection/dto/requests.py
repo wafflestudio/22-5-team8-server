@@ -23,9 +23,9 @@ def validate_overview(value: str | None) -> str | None:
 class CollectionCreateRequest(BaseModel):
     title: Annotated[str, AfterValidator(validate_title)]
     overview: Annotated[str | None, AfterValidator(validate_overview)] = None
-    movie_id: list[int] | None = None
+    movie_ids: list[int] | None = None
 
 class CollectionUpdateRequest(BaseModel):
     title: Annotated[str | None, AfterValidator(validate_title)] = None
     overview: Annotated[str | None, AfterValidator(validate_overview)] = None
-    movie_id: list[int] | None = None
+    movie_ids: list[int] | None = None
