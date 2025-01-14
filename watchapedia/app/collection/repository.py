@@ -4,8 +4,7 @@ from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated, Sequence
 from watchapedia.app.movie.models import Movie
-from watchapedia.app.collection.models import Collection, UserLikesCollection, UserLikesCollectionComment
-from watchapedia.app.collection.errors import CollectionNotFoundError
+from watchapedia.app.collection.models import Collection, UserLikesCollection
 from datetime import datetime
 
 class CollectionRepository():

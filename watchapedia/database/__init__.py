@@ -6,3 +6,4 @@ import watchapedia.app.participant.models
 import watchapedia.app.review.models
 import watchapedia.app.comment.models
 import watchapedia.app.collection.models
+import watchapedia.app.collection_comment.models
