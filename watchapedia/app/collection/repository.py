@@ -34,3 +34,7 @@ class CollectionRepository():
             collection.movies.append(movie)
 
         self.session.flush()
+
+    def get_collection_by_collection_id(self, collection_id: int) -> Collection | None:
+        get_collection_query = select(Collection).filter(Collection.id == collection_id)
+        return self.session.scalar(get_collection_query)

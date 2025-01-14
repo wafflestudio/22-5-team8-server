@@ -6,6 +6,7 @@ from watchapedia.app.collection.models import Collection
 from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCompactResponse
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
+from watchapedia.app.collection.errors import CollectionNotFoundError
 
 class CollectionService:
     def __init__(
@@ -31,6 +32,12 @@ class CollectionService:
                 movies.append(movie)
             self.collection_repository.add_collection_movie(collection=collection, movies=movies)
         
+        return self._process_collection_process(collection)
+    
+    def get_collection_by_collection_id(self, collection_id: int) -> CollectionResponse:
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id=collection_id)
+        if collection is None:
+            raise CollectionNotFoundError()
         return self._process_collection_process(collection)
     
     def _process_collection_process(self, collection: Collection) -> CollectionResponse:
