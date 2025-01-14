@@ -28,4 +28,5 @@ class CollectionCreateRequest(BaseModel):
 class CollectionUpdateRequest(BaseModel):
     title: Annotated[str | None, AfterValidator(validate_title)] = None
     overview: Annotated[str | None, AfterValidator(validate_overview)] = None
-    movie_ids: list[int] | None = None
+    add_movie_ids: list[int] | None = None
+    delete_movie_ids: list[int] | None = None

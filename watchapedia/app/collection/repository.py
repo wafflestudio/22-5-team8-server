@@ -35,6 +35,31 @@ class CollectionRepository():
 
         self.session.flush()
 
+    def update_collection(
+            self, collection: Collection, title: str | None, overview: str | None, add_movie_ids: list[int] | None, delete_movie_ids: list[int] | None
+    ) -> None:
+        if title:
+            collection.title = title
+
+        if overview:
+            collection.overview = overview
+        
+        if delete_movie_ids:
+            for delete_movie_id in delete_movie_ids:
+                delete_movie = self.get_movie_by_movie_id(delete_movie_id)
+                collection.movies.remove(delete_movie)
+
+        if add_movie_ids:
+            for add_movie_id in add_movie_ids:
+                add_movie = self.get_movie_by_movie_id(add_movie_id)
+                collection.movies.append(add_movie)
+
+        self.session.flush()
+
     def get_collection_by_collection_id(self, collection_id: int) -> Collection | None:
         get_collection_query = select(Collection).filter(Collection.id == collection_id)
         return self.session.scalar(get_collection_query)
+    
+    def get_movie_by_movie_id(self, movie_id: int) -> Movie | None:
+        get_movie_query = select(Movie).filter(Movie.id==movie_id)
+        return self.session.scalar(get_movie_query)

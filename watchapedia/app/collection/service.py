@@ -6,7 +6,8 @@ from watchapedia.app.collection.models import Collection
 from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCompactResponse
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
-from watchapedia.app.collection.errors import CollectionNotFoundError
+from watchapedia.app.collection.errors import *
+from watchapedia.common.errors import PermissionDeniedError
 
 class CollectionService:
     def __init__(
@@ -34,11 +35,42 @@ class CollectionService:
         
         return self._process_collection_process(collection)
     
+    def update_collection(
+            self, collection_id: int, user_id: int, title: int | None, overview: int | None, add_movie_ids: list[int] | None, delete_movie_ids: list[int] | None
+    ) -> None:
+        if not any([title, overview, add_movie_ids, delete_movie_ids]):
+            raise InvalidFormatError()
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id)
+        if not collection.user_id == user_id:
+            raise PermissionDeniedError()
+        
+        movie_id_list = self.get_movie_ids_from_collection(collection_id)
+        if delete_movie_ids:
+            for delete_movie_id in delete_movie_ids:
+                if delete_movie_id not in movie_id_list:
+                    raise NoSuchMovieError()
+        if add_movie_ids:
+            for add_movie_id in add_movie_ids:
+                if self.movie_repository.get_movie_by_movie_id(add_movie_id) is None:
+                    raise MovieNotFoundError()
+                if add_movie_id in movie_id_list:
+                    raise MovieAlreadyExistsError()
+        
+        self.collection_repository.update_collection(
+            collection=collection, title=title, overview=overview, add_movie_ids=add_movie_ids, delete_movie_ids=delete_movie_ids
+        )
+
     def get_collection_by_collection_id(self, collection_id: int) -> CollectionResponse:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id=collection_id)
         if collection is None:
             raise CollectionNotFoundError()
         return self._process_collection_process(collection)
+    
+    def get_movie_ids_from_collection(self, collection_id: int) -> list[int] | None:
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id=collection_id)
+        if collection is None:
+            raise CollectionNotFoundError()
+        return [ movie.id for movie in collection.movies ]
     
     def _process_collection_process(self, collection: Collection) -> CollectionResponse:
         return CollectionResponse(
