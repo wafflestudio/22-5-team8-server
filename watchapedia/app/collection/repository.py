@@ -87,3 +87,7 @@ class CollectionRepository():
     def get_movie_by_movie_id(self, movie_id: int) -> Movie | None:
         get_movie_query = select(Movie).filter(Movie.id==movie_id)
         return self.session.scalar(get_movie_query)
+    
+    def delete_collection_by_id(self, collection: Collection) -> None:
+        self.session.delete(collection)
+        self.session.flush()

@@ -72,3 +72,15 @@ def get_collections_by_user(
     collection_service: Annotated[CollectionService, Depends()]
 ) -> list[CollectionResponse]:
     return collection_service.get_user_collections(user)
+
+@collection_router.delete("/{collection_id}",
+                        status_code=204,
+                        summary="컬렉션 삭제",
+                        description="[로그인 필요] 컬렉션 id를 받아 해당 컬렉션을 삭제합니다. 성공 시 'Success' 반환")
+def delete_collection(
+    collection_id: int,
+    user: Annotated[User, Depends(login_with_header)],
+    collection_service: Annotated[CollectionService, Depends()]
+):
+    collection_service.delete_collection_by_id(collection_id, user)
+    return "Success"

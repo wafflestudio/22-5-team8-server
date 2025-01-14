@@ -51,7 +51,7 @@ class Collection(Base):
     user: Mapped["User"] = relationship("User", back_populates="collections")
     
     movies: Mapped[list["Movie"]] = relationship(
-        secondary="movie_collection", back_populates="collections", cascade="all, delete"
+        secondary="movie_collection", back_populates="collections"
     )
     comments: Mapped[list["CollectionComment"]] = relationship(
         "CollectionComment", back_populates="collection", cascade="all, delete, delete-orphan"
