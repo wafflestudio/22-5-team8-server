@@ -62,3 +62,13 @@ def like_collection(
     collection_service: Annotated[CollectionService, Depends()],
 ) -> CollectionResponse:
     return collection_service.like_collection(user.id, collection_id)
+
+@collection_router.get("",
+                    status_code=200,
+                    summary="유저 컬렉션 출력",
+                    description="[로그인 필요] 유저가 만든 모든 컬렉션을 반환합니다.")
+def get_collections_by_user(
+    user: Annotated[User, Depends(login_with_header)],
+    collection_service: Annotated[CollectionService, Depends()]
+) -> list[CollectionResponse]:
+    return collection_service.get_user_collections(user)

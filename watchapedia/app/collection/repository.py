@@ -76,6 +76,10 @@ class CollectionRepository():
         self.session.flush()
         return collection
 
+    def get_collections_by_user_id(self, user_id: int) -> Sequence[Collection]:
+        collections_list_query = select(Collection).where(Collection.user_id == user_id)
+        return self.session.scalars(collections_list_query).all()
+
     def get_collection_by_collection_id(self, collection_id: int) -> Collection | None:
         get_collection_query = select(Collection).filter(Collection.id == collection_id)
         return self.session.scalar(get_collection_query)

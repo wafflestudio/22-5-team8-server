@@ -3,6 +3,7 @@ from fastapi import Depends
 from datetime import datetime
 from watchapedia.app.collection.repository import CollectionRepository
 from watchapedia.app.collection.models import Collection
+from watchapedia.app.user.models import User
 from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCompactResponse
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
@@ -33,7 +34,7 @@ class CollectionService:
                 movies.append(movie)
             self.collection_repository.add_collection_movie(collection=collection, movies=movies)
         
-        return self._process_collection_process(collection)
+        return self._process_collection_response(collection)
     
     def update_collection(
             self, collection_id: int, user_id: int, title: int | None, overview: int | None, add_movie_ids: list[int] | None, delete_movie_ids: list[int] | None
@@ -64,7 +65,7 @@ class CollectionService:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id=collection_id)
         if collection is None:
             raise CollectionNotFoundError()
-        return self._process_collection_process(collection)
+        return self._process_collection_response(collection)
     
     def get_movie_ids_from_collection(self, collection_id: int) -> list[int] | None:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id=collection_id)
@@ -75,9 +76,13 @@ class CollectionService:
     def like_collection(self, user_id: int, collection_id: int) -> CollectionResponse:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id)
         updated_collection = self.collection_repository.like_collection(user_id, collection)
-        return self._process_collection_process(updated_collection)
+        return self._process_collection_response(updated_collection)
     
-    def _process_collection_process(self, collection: Collection) -> CollectionResponse:
+    def get_user_collections(self, user: User) -> list[CollectionResponse]:
+        collections = self.collection_repository.get_collections_by_user_id(user.id)
+        return [ self._process_collection_response(collection) for collection in collections ]
+    
+    def _process_collection_response(self, collection: Collection) -> CollectionResponse:
         return CollectionResponse(
             id=collection.id,
             user_id=collection.user_id,
