@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from watchapedia.app.review.models import Review
     from watchapedia.app.comment.models import Comment
+    from watchapedia.app.collection.models import Collection, CollectionComment
 
 class User(Base):
     __tablename__ = 'user'
@@ -18,6 +19,8 @@ class User(Base):
     
     reviews: Mapped[list["Review"]] = relationship("Review", back_populates="user")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user")
+    collections: Mapped[list["Collection"]] = relationship("Collection", back_populates="user")
+    collection_comments: Mapped[list["CollectionComment"]] = relationship("CollectionComment", back_populates="user")
     
 class BlockedToken(Base):
     __tablename__ = "blocked_token"
