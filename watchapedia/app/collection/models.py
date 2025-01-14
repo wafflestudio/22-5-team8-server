@@ -57,6 +57,17 @@ class Collection(Base):
         "CollectionComment", back_populates="collection", cascade="all, delete, delete-orphan"
     )
 
+class UserLikesCollection(Base):
+    __tablename__ = 'user_likes_collection'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    collection_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("collection.id", ondelete="CASCADE"), nullable=False
+    )
+
 class UserLikesCollectionComment(Base):
     __tablename__ = 'user_likes_collection_comment'
 

@@ -50,3 +50,15 @@ def update_collection(
         collection_id, user.id, collection_request.title, collection_request.overview, collection_request.add_movie_ids, collection_request.delete_movie_ids
     )
     return "Success"
+
+@collection_router.patch('/like/{collection_id}',
+                status_code=200, 
+                summary="컬렉션 추천/취소", 
+                description="[로그인 필요] collection_id를 받아 추천되어 있지 않으면 추천하고, 추천되어 있으면 취소합니다.",
+            )
+def like_collection(
+    user: Annotated[User, Depends(login_with_header)],
+    collection_id: int,
+    collection_service: Annotated[CollectionService, Depends()],
+) -> CollectionResponse:
+    return collection_service.like_collection(user.id, collection_id)

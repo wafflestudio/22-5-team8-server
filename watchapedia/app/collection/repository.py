@@ -4,7 +4,7 @@ from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated, Sequence
 from watchapedia.app.movie.models import Movie
-from watchapedia.app.collection.models import Collection, UserLikesCollectionComment
+from watchapedia.app.collection.models import Collection, UserLikesCollection, UserLikesCollectionComment
 from watchapedia.app.collection.errors import CollectionNotFoundError
 from datetime import datetime
 
@@ -55,6 +55,26 @@ class CollectionRepository():
                 collection.movies.append(add_movie)
 
         self.session.flush()
+
+    def like_collection(self, user_id: int, collection: Collection) -> Collection:
+        get_like_query = select(UserLikesCollection).filter(
+            (UserLikesCollection.user_id == user_id)
+            & (UserLikesCollection.collection_id == collection.id)
+        )
+        user_likes_collection = self.session.scalar(get_like_query)
+
+        if user_likes_collection is None:
+            user_likes_collection = UserLikesCollection(
+                user_id=user_id,
+                collection_id=collection.id
+            )
+            self.session.add(user_likes_collection)
+            collection.likes_count += 1
+        else:
+            self.session.delete(user_likes_collection)
+            collection.likes_count -= 1
+        self.session.flush()
+        return collection
 
     def get_collection_by_collection_id(self, collection_id: int) -> Collection | None:
         get_collection_query = select(Collection).filter(Collection.id == collection_id)

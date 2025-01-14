@@ -72,6 +72,11 @@ class CollectionService:
             raise CollectionNotFoundError()
         return [ movie.id for movie in collection.movies ]
     
+    def like_collection(self, user_id: int, collection_id: int) -> CollectionResponse:
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id)
+        updated_collection = self.collection_repository.like_collection(user_id, collection)
+        return self._process_collection_process(updated_collection)
+    
     def _process_collection_process(self, collection: Collection) -> CollectionResponse:
         return CollectionResponse(
             id=collection.id,
