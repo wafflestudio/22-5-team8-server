@@ -16,4 +16,5 @@ class UserSigninResponse(BaseModel):
     refresh_token: str
 
 class UserResponse(BaseModel):
+    id: int
     username: str

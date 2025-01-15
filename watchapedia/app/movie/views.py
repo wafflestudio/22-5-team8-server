@@ -74,20 +74,20 @@ def update_movie(
     return 'Success'
 
 # EC2에서 작동하지 않음
-# @movie_router.post("/crawl",
-#                 status_code=201,
-#                 summary="왓챠피디아 영화 차트 크롤링",
-#                 description="[상당 시간 소요] 왓챠피디아 영화 메인 페이지에 뜨는 영화 차트의 영화들을 크롤링해 DB에 저장합니다. 차트 종류는 박스오피스(box_office), 왓챠 구매순위(watcha_buying), 왓챠 Top10(watcha10), 넷플릭스 순위(netflix)가 있습니다. 성공 시 'Success'를 반환합니다.")
-# def crawl_movie_chart(
-#     movie_service: Annotated[MovieService, Depends()],
-#     chart_type: str
-# ):
-#     allowed_chart_type = {"box_office", "watcha_buying", "watcha10", "netflix"}
-#     if chart_type is None or chart_type not in allowed_chart_type:
-#         raise InvalidFormatError()
-#     crawler = MovieChartCrawler(chart_type, movie_service)
-#     crawler.start_crawling()
-#     return "Success"
+@movie_router.post("/crawl",
+                status_code=201,
+                summary="왓챠피디아 영화 차트 크롤링",
+                description="[상당 시간 소요] 왓챠피디아 영화 메인 페이지에 뜨는 영화 차트의 영화들을 크롤링해 DB에 저장합니다. 차트 종류는 박스오피스(box_office), 왓챠 구매순위(watcha_buying), 왓챠 Top10(watcha10), 넷플릭스 순위(netflix)가 있습니다. 성공 시 'Success'를 반환합니다.")
+def crawl_movie_chart(
+    movie_service: Annotated[MovieService, Depends()],
+   chart_type: str
+):
+    allowed_chart_type = {"box_office", "watcha_buying", "watcha10", "netflix"}
+    if chart_type is None or chart_type not in allowed_chart_type:
+        raise InvalidFormatError()
+    crawler = MovieChartCrawler(chart_type, movie_service)
+    crawler.start_crawling()
+    return "Success"
 
 @movie_router.get("",
                 status_code=200,
