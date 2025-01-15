@@ -29,7 +29,6 @@ class UserService:
     def follow(self, follower_id: int, following_id: int) -> None:
         if self.get_user_by_user_id(following_id) is None:
             raise UserNotFoundError()
-        print(follower_id, following_id)
         if follower_id == following_id:
             raise CANNOT_FOLLOW_MYSELF_Error()
         if self.user_repository.is_following(follower_id, following_id):
@@ -40,9 +39,9 @@ class UserService:
         if self.get_user_by_user_id(following_id) is None:
             raise UserNotFoundError()
         if follower_id == following_id:
-            return CANNOT_FOLLOW_MYSELF_Error()
+            raise CANNOT_FOLLOW_MYSELF_Error()
         if not self.user_repository.is_following(follower_id, following_id):
-            return UserAlreadyNotFollowingError()
+            raise UserAlreadyNotFollowingError()
         self.user_repository.unfollow(follower_id, following_id)
     
     def get_followings(self, user_id: int) -> list[MyProfileResponse]:
