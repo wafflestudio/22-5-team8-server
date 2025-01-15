@@ -1,9 +1,12 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated
-from watchapedia.app.user.models import User, BlockedToken
+from watchapedia.app.user.models import User, BlockedToken, Follow
+from watchapedia.app.review.models import Review
+from watchapedia.app.comment.models import Comment
+from watchapedia.app.collection.models import Collection
 from passlib.context import CryptContext
 from watchapedia.auth.utils import create_hashed_password
 from datetime import datetime
@@ -40,6 +43,45 @@ class UserRepository():
         if login_password is not None:
             user.hashed_pwd = create_hashed_password(login_password)
 
+    def follow(self, follower_id: int, following_id: int) -> None:
+        follow = Follow(follower_id=follower_id, following_id=following_id)
+        self.session.add(follow)
+
+    def unfollow(self, follower_id: int, following_id: int) -> None:
+        unfollow_query = select(Follow).filter(
+            (Follow.follower_id == follower_id) & (Follow.following_id == following_id)
+        )
+        unfollow = self.session.scalar(unfollow_query)
+        self.session.delete(unfollow)
+
+    def get_followings(self, user_id: int) -> list[User]:
+        get_followings_query = select(User).join(Follow, Follow.following_id == User.id).filter(Follow.follower_id == user_id)
+        return self.session.scalars(get_followings_query).all()
+    
+    def get_followers(self, user_id: int) -> list[User]:
+        get_followers_query = select(User).join(Follow, Follow.follower_id == User.id).filter(Follow.following_id == user_id)
+        return self.session.scalars(get_followers_query).all()
+    
+    def get_followings_count(self, user_id: int) -> int:
+        get_following_count_query = select(func.count()).select_from(Follow).where(Follow.follower_id == user_id)
+        return self.session.scalar(get_following_count_query)
+    
+    def get_followers_count(self, user_id: int) -> int:
+        get_followers_count_query = select(func.count()).select_from(Follow).where(Follow.following_id == user_id)
+        return self.session.scalar(get_followers_count_query)
+    
+    def get_reviews_count(self, user_id: int) -> int:
+        count_query = select(func.count()).select_from(Review).where(Review.user_id == user_id)
+        return self.session.scalar(count_query)
+    
+    def get_comments_count(self, user_id: int) -> int:
+        count_query = select(func.count()).select_from(Comment).where(Comment.user_id == user_id)
+        return self.session.scalar(count_query)
+    
+    def get_collections_count(self, user_id: int) -> int:
+        count_query = select(func.count()).select_from(Collection).where(Collection.user_id == user_id)
+        return self.session.scalar(count_query)
+
     def get_user_by_login_id(self, login_id: str) -> User | None:
         get_user_query = select(User).filter(User.login_id == login_id)
         return self.session.scalar(get_user_query)
@@ -64,3 +106,9 @@ class UserRepository():
             )
             is not None
         )
+    
+    def is_following(self, follower_id: int, following_id: int) -> bool:
+        follow_query = select(Follow).filter(
+            (Follow.follower_id == follower_id) & (Follow.following_id == following_id)
+        )
+        return self.session.scalar(follow_query) is not None

@@ -3,6 +3,7 @@ from watchapedia.common.errors import InvalidFieldFormatError
 import re
 from typing import Annotated
 from pydantic.functional_validators import AfterValidator
+from watchapedia.app.participant.dto.requests import validate_url
 
 USERNAME_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 LOGIN_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_.]{6,20}$")
@@ -65,3 +66,4 @@ class UserSigninRequest(BaseModel):
 class UserUpdateRequest(BaseModel):
     username: Annotated[str | None, AfterValidator(validate_username)] = None
     login_password: Annotated[str | None, AfterValidator(validate_password)] = None
+    profile_url: Annotated[str | None, AfterValidator(validate_url)] = None

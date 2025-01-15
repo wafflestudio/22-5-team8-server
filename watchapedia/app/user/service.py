@@ -2,7 +2,8 @@ from typing import Annotated
 from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
-from watchapedia.app.user.errors import UserAlreadyExistsError
+from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error
+from watchapedia.app.user.dto.responses import MyProfileResponse
 from watchapedia.auth.utils import verify_password
 from watchapedia.app.user.models import User
 from watchapedia.auth.utils import create_access_token, create_refresh_token, decode_token
@@ -22,9 +23,50 @@ class UserService:
         user = self.get_user_by_login_id(login_id)
         if user is None or verify_password(login_password, user.hashed_pwd) is False:
             raise InvalidCredentialsError()
-        
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
         return self.issue_token(login_id)
+    
+    def follow(self, follower_id: int, following_id: int) -> None:
+        if self.get_user_by_user_id(following_id) is None:
+            raise UserNotFoundError()
+        print(follower_id, following_id)
+        if follower_id == following_id:
+            raise CANNOT_FOLLOW_MYSELF_Error()
+        if self.user_repository.is_following(follower_id, following_id):
+            raise UserAlreadyFollowingError()
+        self.user_repository.follow(follower_id, following_id)
+
+    def unfollow(self, follower_id: int, following_id: int) -> None:
+        if self.get_user_by_user_id(following_id) is None:
+            raise UserNotFoundError()
+        if follower_id == following_id:
+            return CANNOT_FOLLOW_MYSELF_Error()
+        if not self.user_repository.is_following(follower_id, following_id):
+            return UserAlreadyNotFollowingError()
+        self.user_repository.unfollow(follower_id, following_id)
+    
+    def get_followings(self, user_id: int) -> list[MyProfileResponse]:
+        users= self.user_repository.get_followings(user_id)
+        return [self._process_user_response(user) for user in users]
+    
+    def get_followers(self, user_id: int) -> list[MyProfileResponse]:
+        users = self.user_repository.get_followers(user_id)
+        return [self._process_user_response(user) for user in users]
+    
+    def get_followings_count(self, user_id: int) -> int:
+        return self.user_repository.get_followings_count(user_id)
+    
+    def get_followers_count(self, user_id: int) -> int:
+        return self.user_repository.get_followers_count(user_id)
+    
+    def get_reviews_count(self, user_id: int) -> int:
+        return self.user_repository.get_reviews_count(user_id)
+    
+    def get_comments_count(self, user_id: int) -> int:
+        return self.user_repository.get_comments_count(user_id)
+    
+    def get_collections_count(self, user_id: int) -> int:
+        return self.user_repository.get_collections_count(user_id)
     
     def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
         self.user_repository.update_user(user_id, username, login_password)
@@ -68,3 +110,10 @@ class UserService:
     
     def block_refresh_token(self, token_id: str, expired_at: datetime) -> None:
         self.user_repository.block_token(token_id, expired_at)
+
+    def _process_user_response(self, user: User) -> MyProfileResponse:
+        return MyProfileResponse(
+            username=user.username,
+            login_id=user.login_id,
+            profile_url=user.profile_url
+            )
