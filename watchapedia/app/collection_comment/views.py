@@ -67,8 +67,8 @@ def like_comment(
                 summary="코멘트 삭제",
                 description="[로그인 필요] 코멘트 id를 받아 해당 코멘트을 삭제합니다. 성공 시 204 code 반환")
 def delete_comment(
-    collection_id: int,
+    comment_id: int,
     user: Annotated[User, Depends(login_with_header)],
     collection_comment_service: Annotated[CollectionCommentService, Depends()]
 ):
-    collection_comment_service.delete_comment_by_id(collection_id, user)
+    collection_comment_service.delete_comment_by_id(comment_id, user)
