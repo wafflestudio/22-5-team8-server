@@ -16,6 +16,7 @@ class UserProfileResponse(BaseModel):
     username: str
     login_id: str
     profile_url: str | None = None
+    status_message: str | None = None
     following_count: int | None = None
     follower_count: int | None = None
     review_count: int | None = None
@@ -28,6 +29,7 @@ class UserProfileResponse(BaseModel):
             username=user.username, 
             login_id=user.login_id,
             profile_url=user.profile_url,
+            status_message=user.status_message,
             following_count=following_count,
             follower_count=follower_count,
             review_count=review_count,

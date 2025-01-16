@@ -34,7 +34,7 @@ class UserRepository():
         
         return self.session.scalar(get_user_query)
     
-    def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
+    def update_user(self, user_id:int, username: str | None, login_password: str | None, profile_url: str | None, status_message: str | None) -> None:
         user = self.get_user_by_user_id(user_id)
         if username is not None:
             if self.get_user_by_username(username) is not None:
@@ -42,6 +42,10 @@ class UserRepository():
             user.username = username
         if login_password is not None:
             user.hashed_pwd = create_hashed_password(login_password)
+        if profile_url is not None:
+            user.profile_url = profile_url
+        if status_message is not None:
+            user.status_message = status_message
 
     def follow(self, follower_id: int, following_id: int) -> None:
         follow = Follow(follower_id=follower_id, following_id=following_id)

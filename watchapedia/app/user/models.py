@@ -17,6 +17,7 @@ class User(Base):
     login_id: Mapped[str] = mapped_column(String(50), nullable=False)
     hashed_pwd: Mapped[str] = mapped_column(String(100), nullable=False)
     profile_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    status_message: Mapped[str | None] = mapped_column(String(100), nullable=True)
     
     reviews: Mapped[list["Review"]] = relationship("Review", back_populates="user")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user")

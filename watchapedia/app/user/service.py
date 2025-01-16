@@ -45,10 +45,14 @@ class UserService:
         self.user_repository.unfollow(follower_id, following_id)
     
     def get_followings(self, user_id: int) -> list[MyProfileResponse]:
+        if self.get_user_by_user_id(user_id) is None:
+            raise UserNotFoundError()
         users= self.user_repository.get_followings(user_id)
         return [self._process_user_response(user) for user in users]
     
     def get_followers(self, user_id: int) -> list[MyProfileResponse]:
+        if self.get_user_by_user_id(user_id) is None:
+            raise UserNotFoundError()
         users = self.user_repository.get_followers(user_id)
         return [self._process_user_response(user) for user in users]
     
@@ -67,8 +71,8 @@ class UserService:
     def get_collections_count(self, user_id: int) -> int:
         return self.user_repository.get_collections_count(user_id)
     
-    def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
-        self.user_repository.update_user(user_id, username, login_password)
+    def update_user(self, user_id:int, username: str | None, login_password: str | None, profile_url: str | None, status_message: str | None) -> None:
+        self.user_repository.update_user(user_id, username, login_password, profile_url, status_message)
 
     def raise_if_user_exists(self, username: str, login_id: str) -> None:
         if self.user_repository.get_user(username, login_id) is not None:

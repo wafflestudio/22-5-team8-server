@@ -76,7 +76,7 @@ def signin(
 @user_router.get('/me',
                 status_code=200, 
                 summary="내 정보", 
-                description="access_token을 헤더에 담아 요청하면 내 정보를 반환합니다.",
+                description="access_token을 헤더에 담아 요청하면 내 정보(유저 이름, 로그인 id, 프로필 url)를 반환합니다.",
                 response_model=MyProfileResponse
                 )
 def me(
@@ -90,7 +90,7 @@ def update_me(
     update_request: UserUpdateRequest,
     user_service: Annotated[UserService, Depends()],
 ):
-    user_service.update_user(user.id, username= update_request.username, login_password=update_request.login_password)
+    user_service.update_user(user.id, username= update_request.username, login_password=update_request.login_password, profile_url=update_request.profile_url, status_message=update_request.status_message)
     return "Success"
 
 @user_router.post('/follow/{follow_user_id}', status_code=201, summary="팔로우", description="user_id를 받아 해당 유저를 팔로우하고 성공 시 'Success'를 반환합니다.")

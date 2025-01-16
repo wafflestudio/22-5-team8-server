@@ -54,6 +54,14 @@ def validate_password(value: str | None) -> str | None:
 
     return value
 
+def validate_status_message(value: str | None) -> str | None:
+    # status_message 필드는 100자 이하의 문자열
+    if value is None:
+        return value
+    if len(value) > 100:
+        raise InvalidFieldFormatError("status_message")
+    return value
+
 class UserSignupRequest(BaseModel):
     username: Annotated[str, AfterValidator(validate_username)]
     login_id: Annotated[str, AfterValidator(validate_login_id)]
@@ -67,3 +75,4 @@ class UserUpdateRequest(BaseModel):
     username: Annotated[str | None, AfterValidator(validate_username)] = None
     login_password: Annotated[str | None, AfterValidator(validate_password)] = None
     profile_url: Annotated[str | None, AfterValidator(validate_url)] = None
+    status_message: Annotated[str | None ,AfterValidator(validate_status_message)] = None

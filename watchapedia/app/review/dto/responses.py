@@ -7,6 +7,7 @@ class ReviewResponse(BaseModel):
     id: int
     user_id: int
     user_name: str
+    profile_url: str | None
     movie_id: int
     content: str | None
     rating: float | None
