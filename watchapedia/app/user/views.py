@@ -111,19 +111,19 @@ def unfollow(
     user_service.unfollow(user.id, follow_user_id)
     return "Success"
 
-@user_router.get('/followings', status_code=200, summary="팔로잉 목록", description="access_token을 헤더에 담아 요청하면 내가 팔로잉하는 유저들의 목록을 반환합니다.")
+@user_router.get('/followings/{user_id}', status_code=200, summary="팔로잉 목록", description="user_id를 받아 해당 유저가 팔로우하는 유저들의 목록을 반환합니다.")
 def followings(
-    user: Annotated[User, Depends(login_with_header)],
+    user_id: int,
     user_service: Annotated[UserService, Depends()],
 ) -> list[MyProfileResponse]:
-    return user_service.get_followings(user.id)
+    return user_service.get_followings(user_id)
 
-@user_router.get('/followers', status_code=200, summary="팔로워 목록", description="access_token을 헤더에 담아 요청하면 나를 팔로우하는 유저들의 목록을 반환합니다.")
+@user_router.get('/followers/{user_id}', status_code=200, summary="팔로워 목록", description="user_id를 받아 해당 유저를 팔로우하는 유저들의 목록을 반환합니다.")
 def followers(
-    user: Annotated[User, Depends(login_with_header)],
+    user_id: int,
     user_service: Annotated[UserService, Depends()],
 ):
-    return user_service.get_followers(user.id)
+    return user_service.get_followers(user_id)
 
 @user_router.get('/profile/{user_id}', status_code=200, summary="프로필 조회", description="user_id를 받아 해당 유저의 프로필 정보를 반환합니다.")
 def profile(
