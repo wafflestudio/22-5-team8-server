@@ -56,6 +56,7 @@ class CommentService:
             id=comment.id,
             user_id=comment.user.id,
             user_name=comment.user.username,
+            profile_url=comment.user.profile_url,
             review_id=comment.review_id,
             content=comment.content,
             likes_count=comment.likes_count,

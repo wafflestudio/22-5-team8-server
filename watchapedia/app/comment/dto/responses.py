@@ -7,6 +7,7 @@ class CommentResponse(BaseModel):
     id: int
     user_id: int
     user_name: str
+    profile_url: str | None
     review_id: int
     content: str
     likes_count: int

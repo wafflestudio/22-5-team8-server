@@ -72,6 +72,7 @@ class ReviewService:
             id=review.id,
             user_id=review.user.id,
             user_name=review.user.username,
+            profile_url=review.user.profile_url,
             movie_id=review.movie_id,
             content=review.content,
             rating=review.rating,
