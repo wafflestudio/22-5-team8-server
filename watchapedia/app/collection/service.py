@@ -84,6 +84,10 @@ class CollectionService:
         collections = self.collection_repository.get_collections_by_user_id(user.id)
         return [ self._process_collection_response(collection) for collection in collections ]
     
+    def search_collection_list(self, title: str) -> list[CollectionResponse] | None:
+        collections = self.collection_repository.search_collection_list(title)
+        return [ self._process_collection_response(collection) for collection in collections ]
+
     def delete_collection_by_id(self, collection_id: int, user: User) -> None:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id)
         if collection is None:

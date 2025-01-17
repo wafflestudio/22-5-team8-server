@@ -59,6 +59,15 @@ class ParticipantService():
         
     def get_participant_roles(self, participant_id: int):
         return self.participant_repository.get_participant_roles(participant_id)
+    
+    def search_participant_list(self, name: str) -> list[ParticipantProfileResponse] | None:
+        participants = self.participant_repository.search_participant_list(name)
+        return [ParticipantProfileResponse(
+                id=participant.id,
+                name=participant.name,
+                profile_url=None,
+                roles=['temp'],
+                biography=None) for participant in participants]
 
     def _process_movies(self, movies: list[Movie], cast: str) -> list[MovieDataResponse]:
         return [MovieDataResponse(id=movie.id, 

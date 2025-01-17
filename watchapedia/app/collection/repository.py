@@ -83,6 +83,11 @@ class CollectionRepository():
         get_collection_query = select(Collection).filter(Collection.id == collection_id)
         return self.session.scalar(get_collection_query)
     
+    # title으로 복수의 collection get. 부분집합 허용.
+    def search_collection_list(self, title: str) -> list[Collection] | None:
+        get_collection_query = select(Collection).filter(Collection.title.ilike(f"%{title}%"))
+        return self.session.execute(get_collection_query).scalars().all()
+
     def get_movie_by_movie_id(self, movie_id: int) -> Movie | None:
         get_movie_query = select(Movie).filter(Movie.id==movie_id)
         return self.session.scalar(get_movie_query)

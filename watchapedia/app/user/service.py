@@ -3,7 +3,7 @@ from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
 from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error
-from watchapedia.app.user.dto.responses import MyProfileResponse
+from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse
 from watchapedia.auth.utils import verify_password
 from watchapedia.app.user.models import User
 from watchapedia.auth.utils import create_access_token, create_refresh_token, decode_token
@@ -87,6 +87,11 @@ class UserService:
     def get_user_by_username(self, username: str) -> User | None:
         return self.user_repository.get_user_by_username(username)
     
+    def search_user_list(self, username: str) -> list[UserResponse] | None:
+        users = self.user_repository.search_user_list(username)
+        return [UserResponse(
+                id=user.id) for user in users]
+
     def validate_access_token(self, token: str) -> dict:
         payload = decode_token(token)
         if payload['typ'] != 'access':

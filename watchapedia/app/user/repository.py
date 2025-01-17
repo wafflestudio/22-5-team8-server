@@ -98,6 +98,11 @@ class UserRepository():
         get_user_query = select(User).filter(User.username == username)
         return self.session.scalar(get_user_query)
     
+    # username으로 복수의 user get. 부분집합 허용.
+    def search_user_list(self, username: str) -> list[User] | None:
+        get_user_query = select(User).filter(User.username.ilike(f"%{username}%"))
+        return self.session.execute(get_user_query).scalars().all()
+
     def block_token(self, token_id: str, expired_at: datetime) -> None:
         blocked_token = BlockedToken(token_id=token_id, expired_at=expired_at)
         self.session.add(blocked_token)
