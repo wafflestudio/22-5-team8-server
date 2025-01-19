@@ -12,4 +12,5 @@ class CommentResponse(BaseModel):
     content: str
     likes_count: int
     created_at: datetime
+    like: bool
 

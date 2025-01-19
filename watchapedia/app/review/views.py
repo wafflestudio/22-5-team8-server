@@ -45,19 +45,19 @@ def update_review(
 @review_router.get('/list',
                 status_code=200, 
                 summary="유저 리뷰 출력", 
-                description="유저가 남긴 모든 리뷰들을 반환합니다다",
+                description="유저가 남긴 모든 리뷰들을 반환합니다",
                 response_model=list[ReviewResponse]
             )
 def get_reviews_by_user(
     user: Annotated[User, Depends(login_with_header)],
     review_service: Annotated[ReviewService, Depends()],
 ):
-    return review_service.user_reviews(user)
+    return review_service.user_reviews(user.id)
 
-@review_router.get('/list/{movie_id}',
+@review_router.get('/{movie_id}',
                 status_code=200, 
-                summary="영화 리뷰 출력", 
-                description="movie_id를 받아 해당 영화에 달린 리뷰들을 반환합니다",
+                summary="비로그인 리뷰 출력", 
+                description="[로그인 불필요] movie_id를 받아 해당 영화에 달린 리뷰들을 반환합니다",
                 response_model=list[ReviewResponse]
                 )
 def get_reviews_by_movie(
@@ -65,6 +65,19 @@ def get_reviews_by_movie(
     review_service: Annotated[ReviewService, Depends()],
 ):
     return review_service.movie_reviews(movie_id)
+    
+@review_router.get('list/{movie_id}',
+                status_code=200, 
+                summary="로그인 리뷰 출력", 
+                description="[로그인 필요] 유저가 남긴 모든 리뷰들을 반환합니다",
+                response_model=list[ReviewResponse]
+            )
+def get_reviews_by_movie_and_user(
+    user: Annotated[User, Depends(login_with_header)],
+    movie_id: int,
+    review_service: Annotated[ReviewService, Depends()],
+):
+    return review_service.movie_user_reviews(user.id, movie_id)
 
 @review_router.patch('/like/{review_id}',
                 status_code=200, 
@@ -78,3 +91,14 @@ def like_review(
     review_service: Annotated[ReviewService, Depends()],
 ):
     return review_service.like_review(user.id, review_id)
+
+@review_router.delete('/{review_id}',
+                status_code=204,
+                summary="리뷰 삭제",
+                description="[로그인 필요] 리뷰 id를 받아 해당 리뷰를 삭제합니다. 성공 시 204 code 반환")
+def delete_review(
+    review_id: int,
+    user: Annotated[User, Depends(login_with_header)],
+    review_service: Annotated[ReviewService, Depends()]
+):
+    review_service.delete_review_by_id(user.id, review_id)
