@@ -66,7 +66,7 @@ def get_reviews_by_movie(
 ):
     return review_service.movie_reviews(movie_id)
     
-@review_router.get('list/{movie_id}',
+@review_router.get('/list/{movie_id}',
                 status_code=200, 
                 summary="로그인 리뷰 출력", 
                 description="[로그인 필요] 유저가 남긴 모든 리뷰들을 반환합니다",

@@ -7,7 +7,7 @@ from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.review.dto.responses import ReviewResponse
 from watchapedia.app.review.repository import ReviewRepository
 from watchapedia.app.review.models import Review
-from watchapedia.app.review.errors import RedundantReviewError
+from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
 from datetime import datetime
 
 class ReviewService:
