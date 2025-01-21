@@ -69,7 +69,7 @@ class CommentService:
         comment = self.comment_repository.get_comment_by_comment_id(comment_id)
         if comment is None:
             raise CommentNotFoundError()
-        if comment.user_id != user.id:
+        if comment.user_id != user_id:
             raise PermissionDeniedError()
         self.comment_repository.delete_comment_by_id(comment)
 
