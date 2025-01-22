@@ -13,12 +13,12 @@ class Comment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user: Mapped["User"] = relationship("User", back_populates="comments")
 
     review_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("review.id"), nullable=False
+        Integer, ForeignKey("review.id", ondelete="CASCADE"), nullable=False
     )
     review: Mapped["Review"] = relationship("Review", back_populates="comments")
 

@@ -20,16 +20,16 @@ class Review(Base):
     status: Mapped[str] = mapped_column(String(20), nullable=True)
 
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     user: Mapped["User"] = relationship("User", back_populates="reviews")
     
     movie_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("movie.id"), nullable=False
+        Integer, ForeignKey("movie.id", ondelete="CASCADE"), nullable=False
     )
     movie: Mapped["Movie"] = relationship("Movie", back_populates="reviews")
 
-    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="review")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="review", cascade="all, delete, delete-orphan")
 
 class UserLikesReview(Base):
     __tablename__ = 'user_likes_review'

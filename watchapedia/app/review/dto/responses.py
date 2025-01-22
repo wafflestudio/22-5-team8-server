@@ -15,4 +15,5 @@ class ReviewResponse(BaseModel):
     created_at: datetime
     spoiler: bool
     status: str | None
+    like: bool
 

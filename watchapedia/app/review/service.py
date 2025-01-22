@@ -7,7 +7,7 @@ from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.review.dto.responses import ReviewResponse
 from watchapedia.app.review.repository import ReviewRepository
 from watchapedia.app.review.models import Review
-from watchapedia.app.review.errors import RedundantReviewError
+from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
 from datetime import datetime
 
 class ReviewService:
@@ -33,7 +33,7 @@ class ReviewService:
                                                         created_at=datetime.now(), spoiler=spoiler, status=status)
         self.movie_repository.update_average_rating(movie)
 
-        return self._process_review_response(new_review)
+        return self._process_review_response(user_id, new_review)
 
     def update_review(self, user_id: int, review_id: int, content: str | None,
                     rating: float | None, spoiler: bool | None, status: str | None
@@ -48,7 +48,8 @@ class ReviewService:
                                                             spoiler=spoiler, status=status)
         self.movie_repository.update_average_rating(movie)
 
-        return self._process_review_response(updated_review)
+        return self._process_review_response(user_id, updated_review)
+
 
     def movie_reviews(self, movie_id: int) -> list[ReviewResponse]:
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
@@ -56,18 +57,36 @@ class ReviewService:
             raise MovieNotFoundError()
 
         reviews = self.review_repository.get_reviews_by_movie_id(movie_id)
-        return [self._process_review_response(review) for review in reviews]
+        return [self._process_review_response(-1, review) for review in reviews]
 
-    def user_reviews(self, user: User) -> list[ReviewResponse]:
-        reviews = self.review_repository.get_reviews_by_user_id(user.id)
-        return [self._process_review_response(review) for review in reviews]
+    def movie_user_reviews(self, user_id: int, movie_id: int) -> list[ReviewResponse]:
+        movie = self.movie_repository.get_movie_by_movie_id(movie_id)
+        if movie is None :
+            raise MovieNotFoundError()
+
+        reviews = self.review_repository.get_reviews_by_movie_id(movie_id)
+        return [self._process_review_response(user_id, review) for review in reviews]
+
+    def user_reviews(self, user_id: int) -> list[ReviewResponse]:
+        reviews = self.review_repository.get_reviews_by_user_id(user_id)
+        return [self._process_review_response(user_id, review) for review in reviews]
+
 
     def like_review(self, user_id: int, review_id: int) -> ReviewResponse :
         review = self.review_repository.get_review_by_review_id(review_id)
         updated_review = self.review_repository.like_review(user_id, review)
-        return self._process_review_response(updated_review)
+        return self._process_review_response(user_id, updated_review)
 
-    def _process_review_response(self, review: Review) -> ReviewResponse:
+    def delete_review_by_id(self, user_id: int, review_id: int) -> None:
+        review = self.review_repository.get_review_by_review_id(review_id)
+        if review is None:
+            raise ReviewNotFoundError()
+        if review.user_id != user_id:
+            raise PermissionDeniedError()
+        self.review_repository.delete_review_by_id(review)
+
+
+    def _process_review_response(self, user_id: int, review: Review) -> ReviewResponse:
         return ReviewResponse(
             id=review.id,
             user_id=review.user.id,
@@ -79,5 +98,6 @@ class ReviewService:
             likes_count=review.likes_count,
             created_at=review.created_at,
             spoiler=review.spoiler,
-            status=review.status
+            status=review.status,
+            like=self.review_repository.like_info(user_id, review)
         )
