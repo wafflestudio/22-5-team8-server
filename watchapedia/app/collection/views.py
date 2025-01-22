@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from datetime import datetime
+from watchapedia.app.user.errors import UserNotFoundError
+from watchapedia.app.user.service import UserService
 from watchapedia.app.user.views import login_with_header
 from watchapedia.app.user.models import User
 from watchapedia.app.collection.service import CollectionService
@@ -83,4 +85,18 @@ def delete_collection(
     collection_service: Annotated[CollectionService, Depends()]
 ):
     collection_service.delete_collection_by_id(collection_id, user)
+
+@collection_router.get("/list/{user_id}",
+                        status_code=200,
+                        summary="유저 컬렉션 리스트 조회",
+                        description="[로그인 불필요] 유저 아이디를 받아 해당 유저의 컬렉션들을 조회합니다.")
+def search_collection_list(
+    user_id: int,
+    collection_service: Annotated[CollectionService, Depends()],
+    user_service: Annotated[UserService, Depends()]
+):
+    user = user_service.get_user_by_user_id(user_id)
+    if user is None:
+        raise UserNotFoundError()
+    return collection_service.get_user_collections(user)
 
