@@ -30,8 +30,6 @@ class CommentRepository():
         self.session.add(comment)
         self.session.flush()
 
-        comment = self.get_comment_by_user_and_review(user_id, review_id)
-
         return comment
 
     def update_comment(self, comment, content: str) -> Comment:
