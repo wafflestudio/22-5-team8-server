@@ -2,7 +2,7 @@ import os
 
 from pydantic_settings import BaseSettings
 
-ENV = os.getenv("ENV", "local") # 배포 시에는(merge) prod로 바꿔주세요
+ENV = os.getenv("ENV", "prod") # 배포 시에는(merge) prod로 바꿔주세요
 assert ENV in ("local", "prod")
 
 
