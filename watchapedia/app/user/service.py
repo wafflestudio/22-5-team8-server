@@ -18,13 +18,13 @@ class UserService:
         self.raise_if_user_exists(username, login_id)
         self.user_repository.add_user(username=username, login_id=login_id, login_password=login_password)
 
-    def signin(self, login_id: str, login_password: str) -> tuple[str, str]:
+    def signin(self, login_id: str, login_password: str) -> tuple[str, str, int]:
         user = self.get_user_by_login_id(login_id)
         if user is None or verify_password(login_password, user.hashed_pwd) is False:
             raise InvalidCredentialsError()
-        
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
-        return self.issue_token(login_id)
+        access_token, refresh_token = self.issue_token(login_id)
+        return access_token, refresh_token, user.id
     
     def update_user(self, user_id:int, username: str | None, login_password: str | None) -> None:
         self.user_repository.update_user(user_id, username, login_password)
