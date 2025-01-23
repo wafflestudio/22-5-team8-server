@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from watchapedia.app.genre.models import Genre
     from watchapedia.app.country.models import Country
     from watchapedia.app.participant.models import Participant
+    from watchapedia.app.collection.models import Collection
 
 class MovieParticipant(Base):
     __tablename__ = "movie_participant"
@@ -48,6 +49,7 @@ class Movie(Base):
     
     genres: Mapped[list["Genre"]] = relationship(secondary="movie_genre", back_populates="movies")
     countries: Mapped[list["Country"]] = relationship(secondary="movie_country", back_populates="movies")
+    collections: Mapped[list["Collection"]] = relationship(secondary="movie_collection", back_populates="movies")
 
     movie_participants: Mapped[list[MovieParticipant]] = relationship("MovieParticipant", back_populates="movie")
     

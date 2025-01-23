@@ -41,7 +41,12 @@ class ParticipantRepository():
             & (Participant.name == name)
         )
         return self.session.scalar(get_participant_query)
-    
+
+    # name으로 복수의 participant get. 부분집합 허용.
+    def search_participant_list(self, name: str) -> list[Participant] | None:
+        get_participant_query = select(Participant).filter(Participant.name.ilike(f"%{name}%"))
+        return self.session.execute(get_participant_query).scalars().all()
+
     def get_participant_by_id(self, participant_id: int) -> Participant | None:
         get_participant_query = select(Participant).filter(Participant.id == participant_id)
         return self.session.scalar(get_participant_query)

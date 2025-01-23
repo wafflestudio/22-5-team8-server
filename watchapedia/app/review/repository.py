@@ -74,6 +74,18 @@ class ReviewRepository():
 
         return review
 
+    def like_info(self, user_id: int, review: Review) -> bool:
+        get_like_query = select(UserLikesReview).filter(
+            (UserLikesReview.user_id == user_id)
+            & (UserLikesReview.review_id == review.id)
+        )
+        user_likes_review = self.session.scalar(get_like_query)
+
+        if user_likes_review is None :
+            return False
+        else :
+            return True
+
     def like_review(self, user_id: int, review: Review) -> None:
         get_like_query = select(UserLikesReview).filter(
             (UserLikesReview.user_id == user_id)
@@ -98,3 +110,7 @@ class ReviewRepository():
         self.session.flush()
 
         return review
+
+    def delete_review_by_id(self, review: Review) -> None:
+        self.session.delete(review)
+        self.session.flush()

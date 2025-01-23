@@ -25,7 +25,7 @@ class CommentService:
         new_comment = self.comment_repository.create_comment(user_id=user_id, review_id=review_id,
                                                     content=content, created_at=datetime.now())
 
-        return self._process_comment_response(new_comment)
+        return self._process_comment_response(user_id, new_comment)
 
     def update_comment(self, user_id: int, comment_id: int, content: str) -> CommentResponse:
         comment = self.comment_repository.get_comment_by_comment_id(comment_id)
@@ -33,15 +33,29 @@ class CommentService:
             raise PermissionDeniedError()
 
         updated_comment = self.comment_repository.update_comment(comment, content=content)
-        return self._process_comment_response(updated_comment)
+        return self._process_comment_response(user_id, updated_comment)
 
-    def list_comments(self, review_id: int) -> list[CommentResponse]:
+
+    def review_comments(self, review_id: int) -> list[CommentResponse]:
         review = self.review_repository.get_review_by_review_id(review_id)
         if review is None :
             raise ReviewNotFoundError()
 
-        comments = self.comment_repository.get_comments(review_id)
-        return [self._process_comment_response(comment) for comment in comments]
+        comments = self.comment_repository.get_comments_by_review_id(review_id)
+        return [self._process_comment_response(-1, comment) for comment in comments]
+
+    def review_user_comments(self, user_id: int, review_id: int) -> list[CommentResponse]:
+        review = self.review_repository.get_review_by_review_id(review_id)
+        if review is None :
+            raise ReviewNotFoundError()
+
+        comments = self.comment_repository.get_comments_by_review_id(review_id)
+        return [self._process_comment_response(user_id, comment) for comment in comments]
+
+    def user_comments(self, user_id: int) -> list[CommentResponse]:
+        comments = self.comment_repository.get_comments_by_user_id(user_id)
+        return [self._process_comment_response(user_id, comment) for comment in comments]
+
 
     def like_comment(self, user_id: int, comment_id: int) -> CommentResponse :
         comment = self.comment_repository.get_comment_by_comment_id(comment_id)
@@ -49,15 +63,26 @@ class CommentService:
             raise CommentNotFoundError()
 
         updated_comment = self.comment_repository.like_comment(user_id, comment)
-        return self._process_comment_response(updated_comment)
+        return self._process_comment_response(user_id, updated_comment)
 
-    def _process_comment_response(self, comment: Comment) -> CommentResponse:
+    def delete_comment_by_id(self, user_id: int, comment_id: int) -> None:
+        comment = self.comment_repository.get_comment_by_comment_id(comment_id)
+        if comment is None:
+            raise CommentNotFoundError()
+        if comment.user_id != user_id:
+            raise PermissionDeniedError()
+        self.comment_repository.delete_comment_by_id(comment)
+
+
+    def _process_comment_response(self, user_id: int, comment: Comment) -> CommentResponse:
         return CommentResponse(
             id=comment.id,
             user_id=comment.user.id,
             user_name=comment.user.username,
+            profile_url=comment.user.profile_url,
             review_id=comment.review_id,
             content=comment.content,
             likes_count=comment.likes_count,
-            created_at=comment.created_at
+            created_at=comment.created_at,
+            like=self.comment_repository.like_info(user_id, comment)
         )

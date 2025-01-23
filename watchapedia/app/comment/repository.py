@@ -30,8 +30,6 @@ class CommentRepository():
         self.session.add(comment)
         self.session.flush()
 
-        comment = self.get_comment_by_user_and_review(user_id, review_id)
-
         return comment
 
     def update_comment(self, comment, content: str) -> Comment:
@@ -40,8 +38,12 @@ class CommentRepository():
 
         return comment
 
-    def get_comments(self, review_id: int) -> Sequence[Comment]:
+    def get_comments_by_review_id(self, review_id: int) -> Sequence[Comment]:
         comments_list_query = select(Comment).where(Comment.review_id == review_id)
+        return self.session.scalars(comments_list_query).all()
+
+    def get_comments_by_user_id(self, user_id: int) -> Sequence[Comment]:
+        comments_list_query = select(Comment).where(Comment.user_id == user_id)
         return self.session.scalars(comments_list_query).all()
 
     def get_comment_by_comment_id(self, comment_id: int) -> Comment:
@@ -50,6 +52,18 @@ class CommentRepository():
             raise CommentNotFoundError()
 
         return comment
+
+    def like_info(self, user_id: int, comment: Comment) -> bool :
+        get_like_query = select(UserLikesComment).filter(
+            (UserLikesComment.user_id == user_id)
+            & (UserLikesComment.comment_id == comment.id)
+        )
+        user_likes_comment = self.session.scalar(get_like_query)
+
+        if user_likes_comment is None :
+            return False
+        else :
+            return True
 
     def like_comment(self, user_id: int, comment: Comment) -> Comment:
         get_like_query = select(UserLikesComment).filter(
@@ -75,3 +89,7 @@ class CommentRepository():
         self.session.flush()
 
         return comment
+
+    def delete_comment_by_id(self, comment: Comment) -> None:
+        self.session.delete(comment)
+        self.session.flush()

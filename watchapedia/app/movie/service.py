@@ -8,6 +8,7 @@ from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundE
 from watchapedia.app.movie.models import Movie
 from watchapedia.app.movie.dto.requests import AddParticipantsRequest, AddMovieListRequest
 from watchapedia.app.movie.dto.responses import MovieDataResponse, ParticipantsDataResponse
+from watchapedia.app.review.models import Review
 
 class MovieService():
     def __init__(self, 
@@ -176,7 +177,7 @@ class MovieService():
             ],
             synopsis=movie.synopsis,
             average_rating=movie.average_rating,
-            ratings_count=len(movie.reviews),
+            ratings_count=self._count_ratings(movie.reviews),
             running_time=movie.running_time,
             grade=movie.grade,
             poster_url=movie.poster_url,
@@ -192,4 +193,9 @@ class MovieService():
             ]
         )
     
-    
+    def _count_ratings(self, reviews: list[Review]) -> int:
+        rating_num = 0
+        for review in reviews:
+            if review.rating is not None:
+                rating_num += 1
+        return rating_num
