@@ -13,5 +13,6 @@ def search(
         search_q: str = Depends(validate_search_query)
         ) -> SearchResponse:
     search_service.search(search_q)
+    search_service.search_genre(search_q)
     return search_service.process_search_response()
 

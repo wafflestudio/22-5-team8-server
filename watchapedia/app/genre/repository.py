@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
@@ -30,4 +30,16 @@ class GenreRepository():
     def get_genre_by_genre_name(self, name: str) -> Genre | None:
         get_genre_query = select(Genre).filter(Genre.name == name)
         return self.session.scalar(get_genre_query)
-        
+    
+    def get_genres_by_genre_name(self, name: str) -> list[Genre]:
+        get_genre_query = select(Genre).filter(
+            or_(
+                Genre.name.contains(name),
+                func.lower(name).like(func.concat("%", Genre.name, "%"))
+                #func.lower(name).like(f"%{Genre.name}%")
+            )
+        )
+        return self.session.scalars(get_genre_query).all()
+        #get_genre_query = select(Genre).filter(Genre.name.contains(name))
+        #return self.session.scalars(get_genre_query).all()
+
