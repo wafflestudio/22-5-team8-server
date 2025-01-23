@@ -59,7 +59,7 @@ def signin(
     signin_request: UserSigninRequest
 ):
     # 토큰 발급
-    access_token, refresh_token, user_id = user_service.signin(signin_request.login_id, signin_request.login_password)
+    access_token, refresh_token = user_service.signin(signin_request.login_id, signin_request.login_password)
 
     # refresh_token은 쿠키에 담아서 반환
     response.set_cookie(
@@ -70,7 +70,7 @@ def signin(
         samesite="lax",
     )
     
-    return UserSigninResponse(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
+    return UserSigninResponse(access_token=access_token, refresh_token=refresh_token)
 
 @user_router.get('/me',
                 status_code=200, 
