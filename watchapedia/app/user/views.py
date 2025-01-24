@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Cookie, Request
 from fastapi.responses import JSONResponse
 from watchapedia.app.user.dto.requests import UserSignupRequest, UserSigninRequest, UserUpdateRequest
-from watchapedia.app.user.dto.responses import UserSigninResponse, MyProfileResponse, UserProfileResponse
+from watchapedia.app.user.dto.responses import UserSigninResponse, MyProfileResponse, UserProfileResponse, BlockedUsersResponse
 from watchapedia.app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
@@ -213,3 +213,17 @@ def unblock_user(
 ):
     user_service.unblock_user(user.id, block_user_id)
     return "Success"
+
+# user_id를 받아 해당 유저가 차단한 유저들의 목록을 반환합니다.
+# 반환 형식은 {"id": list[int]} 입니다.
+@user_router.get('/blocked_users/{user_id}', 
+                status_code=200, 
+                summary="차단한 유저 목록", 
+                description="user_id를 받아 해당 유저가 차단한 유저들의 목록을 반환합니다.",
+                )
+def blocked_users(
+    user_id: int,
+    user_service: Annotated[UserService, Depends()],
+):
+    blocked_users = user_service.get_blocked_users(user_id)
+    return BlockedUsersResponse.from_user(blocked_users)

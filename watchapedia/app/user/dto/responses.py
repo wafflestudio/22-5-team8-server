@@ -42,3 +42,12 @@ class UserSigninResponse(BaseModel):
 
 class UserResponse(BaseModel):
     id: int
+
+class BlockedUsersResponse(BaseModel):
+    id: list[int]
+
+    @staticmethod
+    def from_user(users: list[int]) -> 'BlockedUsersResponse':
+        return BlockedUsersResponse(
+            id=users
+        )
