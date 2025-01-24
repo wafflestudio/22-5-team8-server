@@ -214,8 +214,6 @@ def unblock_user(
     user_service.unblock_user(user.id, block_user_id)
     return "Success"
 
-# user_id를 받아 해당 유저가 차단한 유저들의 목록을 반환합니다.
-# 반환 형식은 {"id": list[int]} 입니다.
 @user_router.get('/blocked_users/{user_id}', 
                 status_code=200, 
                 summary="차단한 유저 목록", 
