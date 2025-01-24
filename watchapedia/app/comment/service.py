@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from watchapedia.common.errors import PermissionDeniedError
+from watchapedia.common.errors import PermissionDeniedError, InvalidRangeError
 from watchapedia.app.review.repository import ReviewRepository
 from watchapedia.app.review.errors import ReviewNotFoundError
 from watchapedia.app.comment.dto.responses import CommentResponse
@@ -36,25 +36,29 @@ class CommentService:
         return self._process_comment_response(user_id, updated_comment)
 
 
-    def review_comments(self, review_id: int) -> list[CommentResponse]:
+    def get_comment(self, comment_id: int) -> CommentResponse:
+        comment = self.comment_repository.get_comment_by_comment_id(comment_id)
+        return self._process_comment_response(-1, comment)
+
+    def review_comments(self, review_id: int, begin: int | None, end: int | None) -> list[CommentResponse]:
         review = self.review_repository.get_review_by_review_id(review_id)
         if review is None :
             raise ReviewNotFoundError()
 
         comments = self.comment_repository.get_comments_by_review_id(review_id)
-        return [self._process_comment_response(-1, comment) for comment in comments]
+        return self._process_range([self._process_comment_response(-1, comment) for comment in comments], begin, end)
 
-    def review_user_comments(self, user_id: int, review_id: int) -> list[CommentResponse]:
+    def review_user_comments(self, user_id: int, review_id: int, begin: int | None, end: int | None) -> list[CommentResponse]:
         review = self.review_repository.get_review_by_review_id(review_id)
         if review is None :
             raise ReviewNotFoundError()
 
         comments = self.comment_repository.get_comments_by_review_id(review_id)
-        return [self._process_comment_response(user_id, comment) for comment in comments]
+        return self._process_range([self._process_comment_response(user_id, comment) for comment in comments], begin, end)
 
-    def user_comments(self, user_id: int) -> list[CommentResponse]:
+    def user_comments(self, user_id: int, begin: int | None, end: int | None) -> list[CommentResponse]:
         comments = self.comment_repository.get_comments_by_user_id(user_id)
-        return [self._process_comment_response(user_id, comment) for comment in comments]
+        return self._process_range([self._process_comment_response(user_id, comment) for comment in comments], begin, end)
 
 
     def like_comment(self, user_id: int, comment_id: int) -> CommentResponse :
@@ -73,6 +77,17 @@ class CommentService:
             raise PermissionDeniedError()
         self.comment_repository.delete_comment_by_id(comment)
 
+    
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[CommentResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
 
     def _process_comment_response(self, user_id: int, comment: Comment) -> CommentResponse:
         return CommentResponse(
