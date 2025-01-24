@@ -24,7 +24,8 @@ class UserService:
         if user is None or verify_password(login_password, user.hashed_pwd) is False:
             raise InvalidCredentialsError()
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
-        return self.issue_token(login_id)
+        access_token, refresh_token = self.issue_token(login_id)
+        return access_token, refresh_token, user.id
     
     def follow(self, follower_id: int, following_id: int) -> None:
         if self.get_user_by_user_id(following_id) is None:
