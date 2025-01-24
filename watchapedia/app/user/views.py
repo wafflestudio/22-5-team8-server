@@ -71,7 +71,7 @@ def signin(
         samesite="lax",
     )
     
-    return UserSigninResponse(access_token=access_token, refresh_token=refresh_token, user_id)
+    return UserSigninResponse(access_token=access_token, refresh_token=refresh_token, user_id=user_id)
 
 @user_router.get('/me',
                 status_code=200, 

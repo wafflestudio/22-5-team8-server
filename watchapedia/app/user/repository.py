@@ -102,6 +102,21 @@ class UserRepository():
     def search_user_list(self, username: str) -> list[User] | None:
         get_user_query = select(User).filter(User.username.ilike(f"%{username}%"))
         return self.session.execute(get_user_query).scalars().all()
+    
+    def block_user(self, blocker_id: int, blocked_id: int) -> None:
+        userblock = UserBlock(blocker_id=blocker_id, blocked_id=blocked_id)
+        self.session.add(userblock)
+        
+    def unblock_user(self, blocker_id: int, blocked_id: int) -> None:
+        unblock_query = select(UserBlock).filter(
+            (UserBlock.blocker_id == blocker_id) & (UserBlock.blocked_id == blocked_id)
+        )
+        unblock = self.session.scalar(unblock_query)
+        self.session.delete(unblock)
+
+    def get_blocked_users(self, user_id: int) -> list[int]:
+        get_blocked_users_query = select(UserBlock).filter(UserBlock.blocker_id == user_id)
+        return [user_block.blocked_id for user_block in self.session.execute(get_blocked_users_query).scalars().all()]
 
     def block_token(self, token_id: str, expired_at: datetime) -> None:
         blocked_token = BlockedToken(token_id=token_id, expired_at=expired_at)
