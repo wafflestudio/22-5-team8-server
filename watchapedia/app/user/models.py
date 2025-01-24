@@ -44,3 +44,14 @@ class Follow(Base):
     __table_args__ = (
         UniqueConstraint('follower_id', 'following_id', name='uq_follower_following'),
     )
+
+class UserBlock(Base):
+    __tablename__ = "user_block"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    blocker_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    blocked_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('blocker_id', 'blocked_id', name='uq_blocker_blocked'),
+    )

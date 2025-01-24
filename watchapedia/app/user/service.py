@@ -91,6 +91,21 @@ class UserService:
         users = self.user_repository.search_user_list(username)
         return [UserResponse(
                 id=user.id) for user in users]
+    
+    def block_user(self, blocker_id: int, blocked_id: int) -> None:
+        if self.get_user_by_user_id(blocked_id) is None:
+            raise UserNotFoundError()
+        self.user_repository.block_user(blocker_id, blocked_id)
+
+    def unblock_user(self, blocker_id: int, blocked_id: int) -> None:
+        if self.get_user_by_user_id(blocked_id) is None:
+            raise UserNotFoundError()
+        self.user_repository.unblock_user(blocker_id, blocked_id)
+        
+    def get_blocked_users(self, user_id: int) -> list[int]:
+        if self.get_user_by_user_id(user_id) is None:
+            raise UserNotFoundError()
+        return self.user_repository.get_blocked_users(user_id)
 
     def validate_access_token(self, token: str) -> dict:
         payload = decode_token(token)

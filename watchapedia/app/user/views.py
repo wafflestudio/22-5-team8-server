@@ -136,9 +136,8 @@ def profile(
     following_count = user_service.get_followings_count(user_id)    
     follwer_count = user_service.get_followers_count(user_id)
     review_count = user_service.get_reviews_count(user_id)
-    comment_count = user_service.get_comments_count(user_id)
     collection_count = user_service.get_collections_count(user_id)
-    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, comment_count, collection_count)
+    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count)
 
 @user_router.get('/refresh', 
                 status_code=200, 
@@ -188,4 +187,29 @@ def logout(
         raise InvalidTokenError()
     response.delete_cookie(key="refresh_token")
     user_service.block_refresh_token(refresh_token, datetime.now())
+    return "Success"
+
+@user_router.post('/block/{block_user_id}',
+                status_code=201, 
+                summary="유저 차단", 
+                description="user_id를 받아 해당 유저를 차단하고 성공 시 'Success'를 반환합니다.",
+                )
+def block_user(
+    block_user_id: int,
+    user_service: Annotated[UserService, Depends()],
+    user: User = Depends(login_with_header),
+):
+    user_service.block_user(user.id, block_user_id)
+    return "Success"
+@user_router.delete('/block/{block_user_id}',
+                status_code=200, 
+                summary="유저 차단 해제", 
+                description="user_id를 받아 해당 유저의 차단을 해제하고 성공 시 'Success'를 반환합니다.",
+                )
+def unblock_user(
+    block_user_id: int,
+    user_service: Annotated[UserService, Depends()],
+    user: User = Depends(login_with_header),
+):
+    user_service.unblock_user(user.id, block_user_id)
     return "Success"

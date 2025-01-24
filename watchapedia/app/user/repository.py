@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated
-from watchapedia.app.user.models import User, BlockedToken, Follow
+from watchapedia.app.user.models import User, BlockedToken, Follow, UserBlock
 from watchapedia.app.review.models import Review
 from watchapedia.app.comment.models import Comment
 from watchapedia.app.collection.models import Collection
