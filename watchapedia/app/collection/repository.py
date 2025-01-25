@@ -4,7 +4,7 @@ from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated, Sequence
 from watchapedia.app.movie.models import Movie
-from watchapedia.app.collection.models import Collection, UserLikesCollection
+from watchapedia.app.collection.models import Collection, UserLikesCollection, MovieCollection
 from datetime import datetime
 
 class CollectionRepository():
@@ -83,6 +83,16 @@ class CollectionRepository():
         get_collection_query = select(Collection).filter(Collection.id == collection_id)
         return self.session.scalar(get_collection_query)
     
+    def get_collections_by_movie_title(self, title: str) -> list[Collection] | None:
+        get_collection_query = (
+                select(Collection)
+                .join(MovieCollection, Collection.id == MovieCollection.collection_id)
+                .join(Movie, Movie.id == MovieCollection.movie_id)
+                .where(Movie.title.ilike(f"%{title}%"))
+                .distinct()
+                )
+        return self.session.execute(get_collection_query).scalars().all()
+
     # title으로 복수의 collection get. 부분집합 허용.
     def search_collection_list(self, title: str) -> list[Collection] | None:
         get_collection_query = select(Collection).filter(Collection.title.ilike(f"%{title}%"))

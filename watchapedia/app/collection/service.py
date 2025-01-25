@@ -86,6 +86,8 @@ class CollectionService:
     
     def search_collection_list(self, title: str) -> list[CollectionResponse] | None:
         collections = self.collection_repository.search_collection_list(title)
+        collections.extend(self.collection_repository.get_collections_by_movie_title(title))
+        collections = list(set(collections))
         return [ self._process_collection_response(collection) for collection in collections ]
 
     def delete_collection_by_id(self, collection_id: int, user: User) -> None:
