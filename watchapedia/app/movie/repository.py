@@ -166,11 +166,13 @@ class MovieRepository():
         rating_num = 0
 
         for review in reviews :
-            if review.rating is not None :
+            if review.rating is not None and review.rating > 0:
                 total_rating += review.rating
                 rating_num += 1
 
         if rating_num >= 1 :
             movie.average_rating = round(total_rating / rating_num, 1)
+        else :
+            movie.average_rating = None
 
         self.session.flush()

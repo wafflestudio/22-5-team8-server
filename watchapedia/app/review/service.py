@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from watchapedia.common.errors import PermissionDeniedError
+from watchapedia.common.errors import PermissionDeniedError, InvalidRangeError
 from watchapedia.app.user.models import User
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
@@ -51,25 +51,29 @@ class ReviewService:
         return self._process_review_response(user_id, updated_review)
 
 
-    def movie_reviews(self, movie_id: int) -> list[ReviewResponse]:
+    def get_review(self, review_id: int) -> ReviewResponse:
+        review = self.review_repository.get_review_by_review_id(review_id)
+        return self._process_review_response(-1, review)
+
+    def movie_reviews(self, movie_id: int, begin: int | None, end: int | None) -> list[ReviewResponse]:
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
         if movie is None :
             raise MovieNotFoundError()
 
         reviews = self.review_repository.get_reviews_by_movie_id(movie_id)
-        return [self._process_review_response(-1, review) for review in reviews]
+        return self._process_range([self._process_review_response(-1, review) for review in reviews], begin, end)
 
-    def movie_user_reviews(self, user_id: int, movie_id: int) -> list[ReviewResponse]:
+    def movie_user_reviews(self, user_id: int, movie_id: int, begin: int | None, end: int | None) -> list[ReviewResponse]:
         movie = self.movie_repository.get_movie_by_movie_id(movie_id)
         if movie is None :
             raise MovieNotFoundError()
 
         reviews = self.review_repository.get_reviews_by_movie_id(movie_id)
-        return [self._process_review_response(user_id, review) for review in reviews]
+        return self._process_range([self._process_review_response(user_id, review) for review in reviews], begin, end)
 
-    def user_reviews(self, user_id: int) -> list[ReviewResponse]:
+    def user_reviews(self, user_id: int, begin: int | None, end: int | None) -> list[ReviewResponse]:
         reviews = self.review_repository.get_reviews_by_user_id(user_id)
-        return [self._process_review_response(user_id, review) for review in reviews]
+        return self._process_range([self._process_review_response(user_id, review) for review in reviews], begin, end)
 
 
     def like_review(self, user_id: int, review_id: int) -> ReviewResponse :
@@ -85,6 +89,17 @@ class ReviewService:
             raise PermissionDeniedError()
         self.review_repository.delete_review_by_id(review)
 
+
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[ReviewResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
 
     def _process_review_response(self, user_id: int, review: Review) -> ReviewResponse:
         return ReviewResponse(

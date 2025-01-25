@@ -12,10 +12,10 @@ def validate_content(value: str | None) -> str | None:
     return value
 
 def validate_rating(value: float) -> float:
-    # 별점은 0.5와 5 사이여야 함
+    # 별점은 0.5와 5 사이여야 함. 0은 삭제된 상태를 의미
     if value is None:
         return value
-    if value > 5 or value < 0.5:
+    if value > 5 or value < 0:
         raise InvalidFieldFormatError("rating")
     return value
 

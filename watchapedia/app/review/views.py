@@ -42,7 +42,7 @@ def update_review(
         user.id, review_id, review.content, review.rating, review.spoiler, review.status
     )
 
-@review_router.get('/list',
+@review_router.get('/user',
                 status_code=200, 
                 summary="유저 리뷰 출력", 
                 description="유저가 남긴 모든 리뷰들을 반환합니다",
@@ -51,10 +51,12 @@ def update_review(
 def get_reviews_by_user(
     user: Annotated[User, Depends(login_with_header)],
     review_service: Annotated[ReviewService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ):
-    return review_service.user_reviews(user.id)
+    return review_service.user_reviews(user.id, begin, end)
 
-@review_router.get('/{movie_id}',
+@review_router.get('/movie/{movie_id}',
                 status_code=200, 
                 summary="비로그인 리뷰 출력", 
                 description="[로그인 불필요] movie_id를 받아 해당 영화에 달린 리뷰들을 반환합니다",
@@ -63,8 +65,10 @@ def get_reviews_by_user(
 def get_reviews_by_movie(
     movie_id: int,
     review_service: Annotated[ReviewService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ):
-    return review_service.movie_reviews(movie_id)
+    return review_service.movie_reviews(movie_id, begin, end)
     
 @review_router.get('/list/{movie_id}',
                 status_code=200, 
@@ -76,8 +80,22 @@ def get_reviews_by_movie_and_user(
     user: Annotated[User, Depends(login_with_header)],
     movie_id: int,
     review_service: Annotated[ReviewService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ):
-    return review_service.movie_user_reviews(user.id, movie_id)
+    return review_service.movie_user_reviews(user.id, movie_id, begin, end)
+
+@review_router.get('/{review_id}',
+                status_code=200, 
+                summary="단일 리뷰 출력", 
+                description="[로그인 불필요] review_id를 받아 해당 리뷰를 반환합니다",
+                response_model=ReviewResponse
+            )
+def get_review(
+    review_id: int,
+    review_service: Annotated[ReviewService, Depends()],
+):
+    return review_service.get_review(review_id)
 
 @review_router.patch('/like/{review_id}',
                 status_code=200, 
