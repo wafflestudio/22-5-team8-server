@@ -27,3 +27,11 @@ class CANNOT_FOLLOW_MYSELF_Error(HTTPException):
 class CANNOT_BLOCK_MYSELF_Error(HTTPException):
     def __init__(self):
         super().__init__(status_code=409, detail="Cannot block myself")
+
+class UserBlockedError(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=409, detail="User blocked")
+
+class UserNotBlockedError(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=409, detail="User not blocked")

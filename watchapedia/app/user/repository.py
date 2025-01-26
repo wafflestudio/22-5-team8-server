@@ -117,7 +117,14 @@ class UserRepository():
     def get_blocked_users(self, user_id: int) -> list[int]:
         get_blocked_users_query = select(UserBlock).filter(UserBlock.blocker_id == user_id)
         return [user_block.blocked_id for user_block in self.session.execute(get_blocked_users_query).scalars().all()]
+    
+    def is_blocked(self, blocker_id: int, blocked_id: int) -> bool:
+        is_blocked_query = select(UserBlock).filter(
+            (UserBlock.blocker_id == blocker_id) & (UserBlock.blocked_id == blocked_id)
+        )
 
+        return self.session.scalar(is_blocked_query) is not None
+    
     def block_token(self, token_id: str, expired_at: datetime) -> None:
         blocked_token = BlockedToken(token_id=token_id, expired_at=expired_at)
         self.session.add(blocked_token)
