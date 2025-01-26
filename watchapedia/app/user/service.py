@@ -2,7 +2,7 @@ from typing import Annotated
 from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
-from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error
+from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error, CANNOT_BLOCK_MYSELF_Error, UserBlockedError, UserNotBlockedError
 from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse
 from watchapedia.auth.utils import verify_password
 from watchapedia.app.user.models import User
@@ -24,7 +24,8 @@ class UserService:
         if user is None or verify_password(login_password, user.hashed_pwd) is False:
             raise InvalidCredentialsError()
         # access token은 10분, refresh token은 24시간 유효한 토큰 생성
-        return self.issue_token(login_id)
+        access_token, refresh_token = self.issue_token(login_id)
+        return access_token, refresh_token, user.id
     
     def follow(self, follower_id: int, following_id: int) -> None:
         if self.get_user_by_user_id(following_id) is None:
@@ -91,6 +92,29 @@ class UserService:
         users = self.user_repository.search_user_list(username)
         return [UserResponse(
                 id=user.id) for user in users]
+    
+    def block_user(self, blocker_id: int, blocked_id: int) -> None:
+        if self.get_user_by_user_id(blocked_id) is None:
+            raise UserNotFoundError()
+        if blocker_id == blocked_id:
+            raise CANNOT_BLOCK_MYSELF_Error()
+        if self.user_repository.is_blocked(blocker_id, blocked_id):
+            raise UserBlockedError()
+        self.user_repository.block_user(blocker_id, blocked_id)
+
+    def unblock_user(self, blocker_id: int, blocked_id: int) -> None:
+        if self.get_user_by_user_id(blocked_id) is None:
+            raise UserNotFoundError()
+        if blocker_id == blocked_id:
+            raise CANNOT_BLOCK_MYSELF_Error()
+        if not self.user_repository.is_blocked(blocker_id, blocked_id):
+            raise UserNotBlockedError()
+        self.user_repository.unblock_user(blocker_id, blocked_id)
+        
+    def get_blocked_users(self, user_id: int) -> list[int]:
+        if self.get_user_by_user_id(user_id) is None:
+            raise UserNotFoundError()
+        return self.user_repository.get_blocked_users(user_id)
 
     def validate_access_token(self, token: str) -> dict:
         payload = decode_token(token)

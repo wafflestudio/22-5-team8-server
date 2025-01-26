@@ -11,7 +11,11 @@ app = FastAPI()
 app.include_router(api_router, prefix="/api")
 
 origins = [
-    "*"
+    "https://d2vsqxcvld4zf7.cloudfront.net",
+    "https://d1xtmfti6ypide.cloudfront.net",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000"
 ]
 
 app.add_middleware(
