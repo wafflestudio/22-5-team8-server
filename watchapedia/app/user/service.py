@@ -2,7 +2,7 @@ from typing import Annotated
 from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
-from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error
+from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error, CANNOT_BLOCK_MYSELF_Error
 from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse
 from watchapedia.auth.utils import verify_password
 from watchapedia.app.user.models import User
@@ -96,11 +96,15 @@ class UserService:
     def block_user(self, blocker_id: int, blocked_id: int) -> None:
         if self.get_user_by_user_id(blocked_id) is None:
             raise UserNotFoundError()
+        if blocker_id == blocked_id:
+            raise CANNOT_BLOCK_MYSELF_Error()
         self.user_repository.block_user(blocker_id, blocked_id)
 
     def unblock_user(self, blocker_id: int, blocked_id: int) -> None:
         if self.get_user_by_user_id(blocked_id) is None:
             raise UserNotFoundError()
+        if blocker_id == blocked_id:
+            raise CANNOT_BLOCK_MYSELF_Error()
         self.user_repository.unblock_user(blocker_id, blocked_id)
         
     def get_blocked_users(self, user_id: int) -> list[int]:
