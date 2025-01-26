@@ -45,7 +45,8 @@ class SearchService():
         user_list = [i.id for i in self.user_list]
         participant_list = [i.id for i in self.participant_list]
         collection_list = [i.id for i in self.collection_list]
-        
+        collection_list.sort()
+
         return SearchResponse(
                 movie_list=movie_list,
                 user_list=user_list,
