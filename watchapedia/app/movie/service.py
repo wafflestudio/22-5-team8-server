@@ -129,8 +129,8 @@ class MovieService():
         countries: list[str] | None = None,
         participant_id: int | None = None
     ) -> list[MovieDataResponse]:
-        if not any([title, chart_type, min_rating, max_rating, genres, countries, participant_id]):
-            raise InvalidFormatError()
+        #if not any([title, chart_type, min_rating, max_rating, genres, countries, participant_id]):
+        #    raise InvalidFormatError()
         movies = self.movie_repository.search_movie_list(
             title=title,
             chart_type=chart_type,
