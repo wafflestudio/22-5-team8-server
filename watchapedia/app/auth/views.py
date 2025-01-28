@@ -11,15 +11,15 @@ auth_router = APIRouter()
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize"
 
-@auth_router.get("/google")
-async def sigin_google():
-    # scope : openid, profile, email
-    return RedirectResponse(url=f"{GOOGLE_AUTH_URL}?client_id={OAUTH_SETTINGS.google_client_id}&redirect_uri={OAUTH_SETTINGS.google_client_id}&response_type=code&scope=openid%20profile%20email")
+# @auth_router.get("/google")
+# async def sigin_google():
+#     # scope : openid, profile, email
+#     return RedirectResponse(url=f"{GOOGLE_AUTH_URL}?client_id={OAUTH_SETTINGS.google_client_id}&redirect_uri={OAUTH_SETTINGS.google_client_id}&response_type=code&scope=openid%20profile%20email")
 
-@auth_router.get("/google/callback")
-async def signin_google_callback(
+@auth_router.get("/google")
+async def signin_google(
     response: JSONResponse,
-    code: str, 
+    code: str,
     auth_service: Annotated[AuthService, Depends()]
     ):
     user_info = await auth_service.get_google_user_info(code)
