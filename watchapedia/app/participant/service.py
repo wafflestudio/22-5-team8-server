@@ -16,17 +16,9 @@ class ParticipantService():
 
     def get_participant_profile(self, participant_id: int) -> ParticipantProfileResponse:
         participant = self.participant_repository.get_participant_by_id(participant_id)
-        tmp = self.get_participant_roles(participant_id)
-        # 감독과 배우 구분
-        roles = set()
-        for role in tmp:
-            if "감독" in role:
-                roles.add("감독")
-            elif "주연"  in role or "조연" in role or "단역" in role:
-                roles.add("배우")
         if participant is None:
             raise ParticipantNotFoundError()
-        return participant, roles
+        return self._process_participant(participant)
 
     def get_participant_movies(self, participant_id: int) -> list[ParticipantDataResponse]:
         participant = self.participant_repository.get_participant_by_id(participant_id)
@@ -56,9 +48,29 @@ class ParticipantService():
             raise InvalidFormatError()
         self.participant_repository.update_participant(participant, name, profile_url, biography)
 
-        
+    def like_participant(self, user_id: int, participant_id: int) -> ParticipantProfileResponse:
+        participant = self.participant_repository.get_participant_by_id(participant_id)
+        if participant is None:
+            raise ParticipantNotFoundError()
+        updated_participant = self.participant_repository.like_participant(user_id, participant)
+        return self._process_participant(updated_participant)
+    
+    def get_like_participant_list(self, user_id: int) -> list[ParticipantProfileResponse]:
+        participants = self.participant_repository.get_like_participant_list(user_id)
+        return [self._process_participant(participant) for participant in participants]
+
     def get_participant_roles(self, participant_id: int):
         return self.participant_repository.get_participant_roles(participant_id)
+    
+    def _process_participant_roles(self, participant_id: int) -> list[str]:
+        roles = set()
+        full_name_roles = self.get_participant_roles(participant_id)
+        for role in full_name_roles:
+            if "감독" in role:
+                roles.add("감독")
+            elif "주연"  in role or "조연" in role or "단역" in role:
+                roles.add("배우")
+        return list(roles)
     
     def search_participant_list(self, name: str) -> list[ParticipantProfileResponse] | None:
         participants = self.participant_repository.search_participant_list(name)
@@ -80,3 +92,13 @@ class ParticipantService():
     
     def _process_participants(self, role: str, movies: list[MovieDataResponse]) -> ParticipantDataResponse:
         return ParticipantDataResponse(role=role, movies=movies)
+    
+    def _process_participant(self, participant: Participant) -> ParticipantProfileResponse:
+        return ParticipantProfileResponse(
+            id=participant.id,
+            name=participant.name,
+            profile_url=participant.profile_url,
+            roles=self._process_participant_roles(participant.id),
+            biography=participant.biography,
+            likes_count=participant.likes_count
+        )

@@ -86,6 +86,10 @@ class ReviewService:
         review = self.review_repository.get_review_by_review_id(review_id)
         updated_review = self.review_repository.like_review(user_id, review)
         return self._process_review_response(user_id, updated_review)
+    
+    def get_like_review_list(self, user_id: int) -> list[ReviewResponse]:
+        reviews = self.review_repository.get_like_review_list(user_id)
+        return [self._process_review_response(user_id, review) for review in reviews]
 
     def delete_review_by_id(self, user_id: int, review_id: int) -> None:
         review = self.review_repository.get_review_by_review_id(review_id)

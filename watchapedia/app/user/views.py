@@ -6,6 +6,9 @@ from watchapedia.app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
 from watchapedia.app.user.service import UserService
+from watchapedia.app.participant.service import ParticipantService
+from watchapedia.app.collection.service import CollectionService
+from watchapedia.app.review.service import ReviewService
 from watchapedia.app.user.errors import InvalidTokenError, UserNotFoundError
 from watchapedia.common.errors import InvalidCredentialsError
 from watchapedia.auth.settings import JWT_SETTINGS
@@ -129,6 +132,9 @@ def followers(
 def profile(
     user_id: int,
     user_service: Annotated[UserService, Depends()],
+    participant_service: Annotated[ParticipantService, Depends()],
+    collection_service: Annotated[CollectionService, Depends()],
+    review_service: Annotated[ReviewService, Depends()],
 ):
     user = user_service.get_user_by_user_id(user_id)
     if user is None:
@@ -137,7 +143,10 @@ def profile(
     follwer_count = user_service.get_followers_count(user_id)
     review_count = user_service.get_reviews_count(user_id)
     collection_count = user_service.get_collections_count(user_id)
-    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count)
+    like_participant_list = participant_service.get_like_participant_list(user_id)
+    like_collection_list = collection_service.get_like_collection_list(user_id)
+    like_review_list = review_service.get_like_review_list(user_id)
+    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count, like_participant_list, like_collection_list, like_review_list)
 
 @user_router.get('/refresh', 
                 status_code=200, 
