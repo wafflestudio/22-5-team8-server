@@ -15,9 +15,10 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     login_id: Mapped[str] = mapped_column(String(50), nullable=False)
-    hashed_pwd: Mapped[str] = mapped_column(String(100), nullable=False)
+    hashed_pwd: Mapped[str] = mapped_column(String(100), nullable=True) # 소셜 로그인의 경우 비밀번호가 없을 수 있음
     profile_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status_message: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    login_type: Mapped[str] = mapped_column(String(50), nullable=True)
     
     reviews: Mapped[list["Review"]] = relationship("Review", back_populates="user")
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="user")
