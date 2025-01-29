@@ -1,7 +1,7 @@
 from typing import Annotated
 from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
-from watchapedia.common.errors import InvalidCredentialsError, InvalidTokenError, BlockedTokenError
+from watchapedia.common.errors import InvalidCredentialsError, InvalidRangeError, InvalidTokenError, BlockedTokenError
 from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error, CANNOT_BLOCK_MYSELF_Error, UserBlockedError, UserNotBlockedError
 from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse
 from watchapedia.auth.utils import verify_password
@@ -45,17 +45,17 @@ class UserService:
             raise UserAlreadyNotFollowingError()
         self.user_repository.unfollow(follower_id, following_id)
     
-    def get_followings(self, user_id: int) -> list[MyProfileResponse]:
+    def get_followings(self, user_id: int, begin: int | None, end: int | None) -> list[MyProfileResponse]:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users= self.user_repository.get_followings(user_id)
-        return [self._process_user_response(user) for user in users]
+        return self._process_range([self._process_user_response(user) for user in users], begin, end)
     
-    def get_followers(self, user_id: int) -> list[MyProfileResponse]:
+    def get_followers(self, user_id: int, begin: int | None, end: int | None) -> list[MyProfileResponse]:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users = self.user_repository.get_followers(user_id)
-        return [self._process_user_response(user) for user in users]
+        return self._process_range([self._process_user_response(user) for user in users], begin, end)
     
     def get_followings_count(self, user_id: int) -> int:
         return self.user_repository.get_followings_count(user_id)
@@ -142,10 +142,21 @@ class UserService:
     
     def block_refresh_token(self, token_id: str, expired_at: datetime) -> None:
         self.user_repository.block_token(token_id, expired_at)
-
+    
     def _process_user_response(self, user: User) -> MyProfileResponse:
         return MyProfileResponse(
             username=user.username,
             login_id=user.login_id,
             profile_url=user.profile_url
             )
+    
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[MyProfileResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
