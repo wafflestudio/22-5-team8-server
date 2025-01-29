@@ -51,6 +51,12 @@ class ReviewService:
         return self._process_review_response(user_id, updated_review)
 
 
+    def get_review_by_user_and_movie(self, user_id: int, movie_id: int) -> ReviewResponse:
+        review = self.review_repository.get_review_by_user_and_movie(user_id, movie_id)
+        if review is None :
+            return None
+        return self._process_review_response(-1, review)
+
     def get_review(self, review_id: int) -> ReviewResponse:
         review = self.review_repository.get_review_by_review_id(review_id)
         return self._process_review_response(-1, review)
