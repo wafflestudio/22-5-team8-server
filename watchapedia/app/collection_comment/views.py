@@ -39,16 +39,29 @@ def update_comment(
         user.id, comment_id, comment.content
     )
 
-@collection_comment_router.get('/{collection_id}',
+@collection_comment_router.get('/{collection_id}/list',
                 status_code=200, 
-                summary="코멘트 출력", 
+                summary="코멘트 리스트 출력", 
                 description="collection_id를 받아 해당 리뷰에 달린 코멘트들을 반환합니다",
                 )
 def get_comments(
     collection_id: int,
     collection_comment_service: Annotated[CollectionCommentService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ) -> list[CollectionCommentResponse]:
-    return collection_comment_service.list_comments(collection_id)
+    return collection_comment_service.list_comments(collection_id, begin, end)
+
+@collection_comment_router.get('/{comment_id}',
+                status_code=200,
+                summary="개별 코멘트 출력",
+                description="comment_id를 받아 해당 코멘트를 반환합니다.",
+                )
+def get_comment(
+    comment_id: int,
+    collection_comment_service: Annotated[CollectionCommentService, Depends()],
+) -> CollectionCommentResponse:
+    return collection_comment_service.get_comment_by_id(comment_id)
 
 @collection_comment_router.patch('/like/{comment_id}',
                 status_code=200, 

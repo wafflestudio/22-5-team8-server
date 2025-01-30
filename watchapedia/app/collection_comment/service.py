@@ -1,6 +1,6 @@
 from typing import Annotated
 from fastapi import Depends
-from watchapedia.common.errors import PermissionDeniedError
+from watchapedia.common.errors import InvalidRangeError, PermissionDeniedError
 from watchapedia.app.collection.repository import CollectionRepository
 from watchapedia.app.collection.errors import CollectionNotFoundError
 from watchapedia.app.collection_comment.dto.responses import CollectionCommentResponse
@@ -36,13 +36,17 @@ class CollectionCommentService:
         updated_comment = self.collection_comment_repository.update_comment(comment, content=content)
         return self._process_comment_response(updated_comment)
 
-    def list_comments(self, collection_id: int) -> list[CollectionCommentResponse]:
+    def list_comments(self, collection_id: int, begin: int | None, end: int | None) -> list[CollectionCommentResponse]:
         collection = self.collection_repository.get_collection_by_collection_id(collection_id)
         if collection is None :
             raise CollectionNotFoundError()
 
         comments = self.collection_comment_repository.get_comments(collection_id)
-        return [self._process_comment_response(comment) for comment in comments]
+        return self._process_range([self._process_comment_response(comment) for comment in comments], begin, end)
+    
+    def get_comment_by_id(self, comment_id: int) -> CollectionCommentResponse:
+        comment = self.collection_comment_repository.get_comment_by_comment_id(comment_id)
+        return self._process_comment_response(comment)
 
     def like_comment(self, user_id: int, comment_id: int) -> CollectionCommentResponse :
         comment = self.collection_comment_repository.get_comment_by_comment_id(comment_id)
@@ -77,3 +81,14 @@ class CollectionCommentService:
             likes_count=comment.likes_count,
             created_at=comment.created_at
         )
+
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[CollectionCommentResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
