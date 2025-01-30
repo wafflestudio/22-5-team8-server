@@ -105,3 +105,12 @@ class CollectionRepository():
     def delete_collection_by_id(self, collection: Collection) -> None:
         self.session.delete(collection)
         self.session.flush()
+
+    def like_info(self, user_id: int, collection: Collection) -> bool:
+        get_like_query = select(UserLikesCollection).filter(
+            (UserLikesCollection.user_id == user_id)
+            & (UserLikesCollection.collection_id == collection.id)
+        )
+        user_likes_collection = self.session.scalar(get_like_query)
+
+        return user_likes_collection is not None

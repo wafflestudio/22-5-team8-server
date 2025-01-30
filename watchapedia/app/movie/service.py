@@ -3,6 +3,7 @@ from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.genre.repository import GenreRepository
 from watchapedia.app.country.repository import CountryRepository
 from watchapedia.app.participant.repository import ParticipantRepository
+from watchapedia.app.review.repository import ReviewRepository
 from fastapi import Depends
 from watchapedia.app.movie.errors import MovieAlreadyExistsError, MovieNotFoundError, InvalidFormatError
 from watchapedia.app.movie.models import Movie
@@ -15,12 +16,14 @@ class MovieService():
         movie_repository: Annotated[MovieRepository, Depends()],
         genre_repository: Annotated[GenreRepository, Depends()],
         country_repository: Annotated[CountryRepository, Depends()],
-        participant_repository: Annotated[ParticipantRepository, Depends()]
+        participant_repository: Annotated[ParticipantRepository, Depends()],
+        review_repository: Annotated[ReviewRepository, Depends()]
     ) -> None:     
         self.movie_repository = movie_repository
         self.genre_repository = genre_repository
         self.country_repository = country_repository
         self.participant_repository = participant_repository
+        self.review_repository = review_repository
     
     def add_movie(
         self, 
@@ -190,7 +193,8 @@ class MovieService():
                     profile_url=participant.participant.profile_url
                 )
                 for participant in movie.movie_participants
-            ]
+            ],
+            reviews_count=self.review_repository.get_reviews_count_by_movie_id(movie.id),
         )
     
     def _count_ratings(self, reviews: list[Review]) -> int:

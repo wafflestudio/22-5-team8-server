@@ -16,4 +16,4 @@ class ReviewResponse(BaseModel):
     spoiler: bool
     status: str | None
     like: bool
-
+    comments_count: int
