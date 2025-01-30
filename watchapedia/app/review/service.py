@@ -6,6 +6,7 @@ from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.review.dto.responses import ReviewResponse
 from watchapedia.app.review.repository import ReviewRepository
+from watchapedia.app.comment.repository import CommentRepository
 from watchapedia.app.review.models import Review
 from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
 from datetime import datetime
@@ -13,10 +14,12 @@ from datetime import datetime
 class ReviewService:
     def __init__(self,
         movie_repository: Annotated[MovieRepository, Depends()],
-        review_repository: Annotated[ReviewRepository, Depends()]
+        review_repository: Annotated[ReviewRepository, Depends()],
+        comment_repository: Annotated[CommentRepository, Depends()]
     ) -> None:
         self.movie_repository = movie_repository
         self.review_repository = review_repository
+        self.comment_repository = comment_repository
 
     def create_review(self, user_id: int, movie_id: int, content: str | None,
                     rating: float | None, spoiler: bool, status: str | None
@@ -120,5 +123,6 @@ class ReviewService:
             created_at=review.created_at,
             spoiler=review.spoiler,
             status=review.status,
-            like=self.review_repository.like_info(user_id, review)
+            like=self.review_repository.like_info(user_id, review),
+            comments_count=self.comment_repository.get_comments_count_by_review_id(review.id)
         )

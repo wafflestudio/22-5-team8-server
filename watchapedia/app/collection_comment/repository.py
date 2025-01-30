@@ -79,3 +79,12 @@ class CollectionCommentRepository():
     def delete_comment_by_id(self, comment: CollectionComment) -> None:
         self.session.delete(comment)
         self.session.flush()
+
+    def like_info(self, user_id: int, comment: CollectionComment) -> bool:
+        get_like_query = select(UserLikesCollectionComment).filter(
+            (UserLikesCollectionComment.user_id == user_id)
+            & (UserLikesCollectionComment.collection_comment_id == comment.id)
+        )
+        user_likes_comment = self.session.scalar(get_like_query)
+
+        return user_likes_comment is not None

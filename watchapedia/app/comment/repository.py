@@ -1,10 +1,11 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
 from typing import Annotated, Sequence
 from datetime import datetime
 from watchapedia.app.comment.models import Comment, UserLikesComment
+from watchapedia.app.review.models import Review
 from watchapedia.app.comment.errors import CommentNotFoundError
 
 class CommentRepository():
@@ -93,3 +94,7 @@ class CommentRepository():
     def delete_comment_by_id(self, comment: Comment) -> None:
         self.session.delete(comment)
         self.session.flush()
+
+    def get_comments_count_by_review_id(self, review_id: int) -> int:
+        comments_count_query = select(func.count()).where(Comment.review_id == review_id)
+        return self.session.scalar(comments_count_query)

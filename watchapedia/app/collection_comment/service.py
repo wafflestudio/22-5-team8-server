@@ -60,6 +60,12 @@ class CollectionCommentService:
             raise PermissionDeniedError()
         self.collection_comment_repository.delete_comment_by_id(comment)
 
+    def like_info(self, user_id: int, comment_id: int) -> bool :
+        comment = self.collection_comment_repository.get_comment_by_comment_id(comment_id)
+        if comment is None :
+            raise CommentNotFoundError()
+        return self.collection_comment_repository.like_info(user_id, comment)
+
     def _process_comment_response(self, comment: CollectionComment) -> CollectionCommentResponse:
         return CollectionCommentResponse(
             id=comment.id,

@@ -2,6 +2,7 @@ from typing import Annotated
 from fastapi import Depends
 from datetime import datetime
 from watchapedia.app.collection.repository import CollectionRepository
+from watchapedia.app.collection_comment.repository import CollectionCommentRepository
 from watchapedia.app.collection.models import Collection
 from watchapedia.app.user.models import User
 from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCompactResponse
@@ -14,10 +15,12 @@ class CollectionService:
     def __init__(
             self, 
             movie_repository: Annotated[MovieRepository, Depends()], 
-            collection_repository: Annotated[CollectionRepository, Depends()]
+            collection_repository: Annotated[CollectionRepository, Depends()],
+            collection_comment_repository: Annotated[CollectionCommentRepository, Depends()]
     ) -> None:
         self.movie_repository = movie_repository
         self.collection_repository = collection_repository
+        self.collection_comment_repository = collection_comment_repository
 
     def create_collection(
             self, user_id: int, movie_ids: list[int] | None, title: str, overview: str | None
@@ -97,6 +100,12 @@ class CollectionService:
         if collection.user_id != user.id:
             raise PermissionDeniedError()
         self.collection_repository.delete_collection_by_id(collection)
+
+    def like_info(self, user_id: int, collection_id: int) -> bool:
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id)
+        if collection is None:
+            raise CollectionNotFoundError()
+        return self.collection_repository.like_info(user_id, collection)
     
     def _process_collection_response(self, collection: Collection) -> CollectionResponse:
         return CollectionResponse(
