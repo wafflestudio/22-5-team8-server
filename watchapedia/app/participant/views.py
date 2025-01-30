@@ -29,8 +29,10 @@ def get_participant_profile(
 def get_participant_movie(
     participant_id: int,
     participant_service: Annotated[ParticipantService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ) -> list[ParticipantDataResponse]:
-    return participant_service.get_participant_movies(participant_id)
+    return participant_service.get_participant_movies(participant_id, begin, end)
 
 
 @participant_router.patch('/{participant_id}',
