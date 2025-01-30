@@ -37,7 +37,7 @@ class UserProfileResponse(BaseModel):
 class UserSigninResponse(BaseModel):
     access_token: str
     refresh_token: str
-    user_id: int
+    user_id: int | None = None
 
 
 class UserResponse(BaseModel):
