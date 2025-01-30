@@ -2,11 +2,12 @@ from typing import Annotated
 from fastapi import Depends
 from watchapedia.app.participant.repository import ParticipantRepository
 from watchapedia.app.participant.errors import ParticipantNotFoundError
-from watchapedia.common.errors import InvalidFormatError
+from watchapedia.common.errors import InvalidFormatError, InvalidRangeError
 from watchapedia.app.participant.dto.responses import ParticipantDataResponse, MovieDataResponse, ParticipantProfileResponse
 from watchapedia.app.movie.models import Movie
 from watchapedia.app.participant.models import Participant
 from collections import defaultdict
+
 
 class ParticipantService():
     def __init__(self,
@@ -20,7 +21,7 @@ class ParticipantService():
             raise ParticipantNotFoundError()
         return self._process_participant(participant)
 
-    def get_participant_movies(self, participant_id: int) -> list[ParticipantDataResponse]:
+    def get_participant_movies(self, participant_id: int, begin: int | None, end: int | None) -> list[ParticipantDataResponse]:
         participant = self.participant_repository.get_participant_by_id(participant_id)
         if participant is None:
             raise ParticipantNotFoundError()
@@ -37,6 +38,9 @@ class ParticipantService():
                 participant_info["출연"].extend(self._process_movies(movies, cast))
         participant_info["감독"] = sorted(participant_info["감독"], key=lambda x: x.year, reverse=True) # 연도 내림차순 정렬
         participant_info["출연"] = sorted(participant_info["출연"], key=lambda x: x.year, reverse=True) # 연도 내림차순 정렬
+        # pagination
+        participant_info["감독"] = self._process_range(participant_info["감독"], begin, end)
+        participant_info["출연"] = self._process_range(participant_info["출연"], begin, end)
         return [self._process_participants(role=cast, movies=movies) for cast, movies in participant_info.items()]
 
     
@@ -92,7 +96,7 @@ class ParticipantService():
     
     def _process_participants(self, role: str, movies: list[MovieDataResponse]) -> ParticipantDataResponse:
         return ParticipantDataResponse(role=role, movies=movies)
-    
+
     def _process_participant(self, participant: Participant) -> ParticipantProfileResponse:
         return ParticipantProfileResponse(
             id=participant.id,
@@ -102,3 +106,14 @@ class ParticipantService():
             biography=participant.biography,
             likes_count=participant.likes_count
         )
+    
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[MovieDataResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]

@@ -93,7 +93,7 @@ class RecommendService():
                     if u_id != user_id and self.user_average_rating(u_id) >= 0 :
                         denom += abs(pcc_dict[u_id])
                         u_review = self.review_service.get_review_by_user_and_movie(u_id, movie.id)
-                        if u_review is not None and u_review.rating > 0 :
+                        if u_review is not None and u_review.rating is not None and u_review.rating > 0 :
                             numer += pcc_dict[u_id] * (u_review.rating - self.user_average_rating(u_id))
             
                 if self.user_average_rating(user_id) >= 0 :

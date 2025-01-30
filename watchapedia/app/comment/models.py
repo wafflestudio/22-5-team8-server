@@ -27,8 +27,8 @@ class UserLikesComment(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     comment_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("comment.id"), nullable=False
+        Integer, ForeignKey("comment.id", ondelete="CASCADE"), nullable=False
     )

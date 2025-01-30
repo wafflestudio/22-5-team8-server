@@ -8,7 +8,7 @@ from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCo
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.collection.errors import *
-from watchapedia.common.errors import PermissionDeniedError
+from watchapedia.common.errors import InvalidRangeError, PermissionDeniedError
 
 class CollectionService:
     def __init__(
@@ -84,9 +84,9 @@ class CollectionService:
         collections = self.collection_repository.get_like_collection_list(user_id)
         return [ self._process_collection_response(collection) for collection in collections ]
     
-    def get_user_collections(self, user: User) -> list[CollectionResponse]:
+    def get_user_collections(self, user: User, begin: int | None, end: int | None) -> list[CollectionResponse]:
         collections = self.collection_repository.get_collections_by_user_id(user.id)
-        return [ self._process_collection_response(collection) for collection in collections ]
+        return self._process_range([self._process_collection_response(collection) for collection in collections], begin, end)
     
     def search_collection_list(self, title: str) -> list[CollectionResponse] | None:
         collections = self.collection_repository.search_collection_list(title)
@@ -121,3 +121,15 @@ class CollectionService:
                 for movie in collection.movies
             ]
         )
+    
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[MovieCompactResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
+
