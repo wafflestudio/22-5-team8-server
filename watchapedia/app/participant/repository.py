@@ -2,7 +2,7 @@ from sqlalchemy import select, distinct
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
-from watchapedia.app.participant.models import Participant
+from watchapedia.app.participant.models import Participant, UserLikesParticipant
 from watchapedia.app.movie.models import Movie, MovieParticipant
 from watchapedia.app.participant.errors import ParticipantAlreadyExistsError
 from typing import Annotated
@@ -68,6 +68,30 @@ class ParticipantRepository():
             participant.biography = biography
         self.session.flush()
 
+    def like_participant(self, user_id: int, participant: Participant) -> None:
+        get_participant_like_query = select(UserLikesParticipant).filter(
+            (UserLikesParticipant.user_id == user_id)
+            & (UserLikesParticipant.participant_id == participant.id)
+        )
+        user_likes_participant = self.session.scalar(get_participant_like_query)
+
+        if user_likes_participant is None:
+            user_likes_participant = UserLikesParticipant(user_id=user_id, participant_id=participant.id)
+            self.session.add(user_likes_participant)
+            participant.likes_count += 1
+        else:
+            self.session.delete(user_likes_participant)
+            participant.likes_count -= 1
+        self.session.flush()
+
+        return participant
+    
+    def get_like_participant_list(self, user_id: int) -> list[Participant]:
+        get_like_participant_query = select(Participant).join(UserLikesParticipant, Participant.id == UserLikesParticipant.participant_id).filter(
+            UserLikesParticipant.user_id == user_id
+        )
+        return self.session.scalars(get_like_participant_query).all()
+    
     def get_participant_roles(self, participant_id: int) -> list[str]:
         get_participant_roles_query = select(distinct(MovieParticipant.role)).filter(
             MovieParticipant.participant_id == participant_id

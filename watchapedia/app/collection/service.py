@@ -83,6 +83,10 @@ class CollectionService:
         updated_collection = self.collection_repository.like_collection(user_id, collection)
         return self._process_collection_response(updated_collection)
     
+    def get_like_collection_list(self, user_id: int) -> list[CollectionResponse]:
+        collections = self.collection_repository.get_like_collection_list(user_id)
+        return [ self._process_collection_response(collection) for collection in collections ]
+    
     def get_user_collections(self, user: User, begin: int | None, end: int | None) -> list[CollectionResponse]:
         collections = self.collection_repository.get_collections_by_user_id(user.id)
         return self._process_range([self._process_collection_response(collection) for collection in collections], begin, end)

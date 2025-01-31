@@ -74,6 +74,10 @@ class CollectionRepository():
             collection.likes_count -= 1
         self.session.flush()
         return collection
+    
+    def get_like_collection_list(self, user_id: int) -> list[Collection]:
+        get_like_collection_query = select(Collection).join(UserLikesCollection, Collection.id == UserLikesCollection.collection_id).filter(UserLikesCollection.user_id == user_id)
+        return self.session.execute(get_like_collection_query).scalars().all()
 
     def get_collections_by_user_id(self, user_id: int) -> Sequence[Collection]:
         collections_list_query = select(Collection).where(Collection.user_id == user_id)

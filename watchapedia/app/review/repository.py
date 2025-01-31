@@ -117,6 +117,11 @@ class ReviewRepository():
         self.session.flush()
 
         return review
+    
+    def get_like_review_list(self, user_id: int) -> list[Review]:
+        get_like_review_query = select(Review).join(UserLikesReview, Review.id == UserLikesReview.review_id).filter(UserLikesReview.user_id == user_id)
+        return self.session.scalars(get_like_review_query).all()
+    
 
     def delete_review_by_id(self, review: Review) -> None:
         self.session.delete(review)

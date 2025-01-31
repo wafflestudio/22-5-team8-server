@@ -6,6 +6,9 @@ from watchapedia.app.user.models import User
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from typing import Annotated
 from watchapedia.app.user.service import UserService
+from watchapedia.app.participant.service import ParticipantService
+from watchapedia.app.collection.service import CollectionService
+from watchapedia.app.review.service import ReviewService
 from watchapedia.app.user.errors import InvalidTokenError, UserNotFoundError
 from watchapedia.common.errors import InvalidCredentialsError
 from watchapedia.auth.settings import JWT_SETTINGS
@@ -133,6 +136,9 @@ def followers(
 def profile(
     user_id: int,
     user_service: Annotated[UserService, Depends()],
+    participant_service: Annotated[ParticipantService, Depends()],
+    collection_service: Annotated[CollectionService, Depends()],
+    review_service: Annotated[ReviewService, Depends()],
 ):
     user = user_service.get_user_by_user_id(user_id)
     if user is None:
@@ -142,6 +148,39 @@ def profile(
     review_count = user_service.get_reviews_count(user_id)
     collection_count = user_service.get_collections_count(user_id)
     return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count)
+
+@user_router.get('/likes_participant',
+                 status_code=200,
+                 summary="추천 인물 목록",
+                 description="[로그인 필요] 추천한 인물 목록을 반환합니다."
+                 )
+def likes_participant(
+    user: Annotated[User, Depends(login_with_header)],
+    participant_service: Annotated[ParticipantService, Depends()],
+):
+    return participant_service.get_like_participant_list(user.id)
+
+@user_router.get('/likes_collection', 
+                 status_code=200,
+                 summary="추천 컬렉션 목록",
+                 description="[로그인 필요] 추천한 컬렉션 목록을 반환합니다."
+                 )
+def likes_collection(
+    user: Annotated[User, Depends(login_with_header)],
+    collection_service: Annotated[CollectionService, Depends()],
+):
+    return collection_service.get_like_collection_list(user.id)
+
+@user_router.get('/likes_review',
+                 status_code=200,
+                 summary="추천 리뷰 목록",
+                 description="[로그인 필요] 추천한 리뷰 목록을 반환합니다."
+                 )
+def likes_review(
+    user: Annotated[User, Depends(login_with_header)],
+    review_service: Annotated[ReviewService, Depends()],
+):
+    return review_service.get_like_review_list(user.id)
 
 @user_router.get('/refresh', 
                 status_code=200, 

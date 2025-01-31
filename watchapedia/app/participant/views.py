@@ -3,6 +3,8 @@ from fastapi import APIRouter, Depends
 from watchapedia.app.participant.service import ParticipantService
 from watchapedia.app.participant.dto.requests import ParticipantProfileUpdateRequest
 from watchapedia.app.participant.dto.responses import ParticipantDataResponse, ParticipantProfileResponse
+from watchapedia.app.user.views import login_with_header
+from watchapedia.app.user.models import User
 
 participant_router = APIRouter()
 
@@ -17,8 +19,7 @@ def get_participant_profile(
     participant_id: int,
     participant_service: Annotated[ParticipantService, Depends()],
 ) -> ParticipantProfileResponse:
-    profile, roles = participant_service.get_participant_profile(participant_id)
-    return ParticipantProfileResponse.from_entity(profile, roles)
+    return participant_service.get_participant_profile(participant_id)
 
 @participant_router.get('/{participant_id}/movies',
                     status_code=200, 
@@ -54,3 +55,15 @@ def update_participant_profile(
     )
 
     return "Success"
+
+@participant_router.patch('/like/{participant_id}',
+                          status_code=200, 
+                    summary="인물 추천/취소", 
+                    description="인물 id를 받아 추천되어 있지 않으면 추천하고, 추천되어 있으면 취소합니다",
+                    )
+def like_participant(
+    user: Annotated[User, Depends(login_with_header)],
+    participant_id: int,
+    participant_service: Annotated[ParticipantService, Depends()],
+):
+    return participant_service.like_participant(user.id, participant_id)

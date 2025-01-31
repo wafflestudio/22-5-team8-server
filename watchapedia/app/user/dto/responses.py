@@ -1,4 +1,7 @@
 from pydantic import BaseModel
+from watchapedia.app.participant.dto.responses import ParticipantProfileResponse
+from watchapedia.app.collection.dto.responses import CollectionResponse
+from watchapedia.app.review.dto.responses import ReviewResponse
 
 class MyProfileResponse(BaseModel):
     username: str
@@ -23,7 +26,12 @@ class UserProfileResponse(BaseModel):
     collection_count: int | None = None
 
     @staticmethod
-    def from_user(user, following_count, follower_count, review_count, collection_count) -> 'UserProfileResponse':
+    def from_user(user, 
+                  following_count, 
+                  follower_count, 
+                  review_count, 
+                  collection_count
+                  ) -> 'UserProfileResponse':
         return UserProfileResponse(
             username=user.username, 
             login_id=user.login_id,
@@ -32,7 +40,7 @@ class UserProfileResponse(BaseModel):
             following_count=following_count,
             follower_count=follower_count,
             review_count=review_count,
-            collection_count=collection_count
+            collection_count=collection_count,
         )
 class UserSigninResponse(BaseModel):
     access_token: str

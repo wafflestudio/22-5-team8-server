@@ -20,6 +20,7 @@ class ParticipantProfileResponse(BaseModel):
     profile_url: str | None
     roles: list[str]
     biography: str | None
+    likes_count: int
 
     @staticmethod
     def from_entity(participant: Participant, roles: list[str]) -> "ParticipantProfileResponse":
@@ -28,5 +29,6 @@ class ParticipantProfileResponse(BaseModel):
             name=participant.name,
             profile_url=participant.profile_url,
             roles=roles,
-            biography=participant.biography
+            biography=participant.biography,
+            likes_count=participant.likes_count
         )
