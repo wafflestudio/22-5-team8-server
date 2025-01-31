@@ -72,3 +72,15 @@ def delete_comment(
     collection_comment_service: Annotated[CollectionCommentService, Depends()]
 ):
     collection_comment_service.delete_comment_by_id(comment_id, user)
+
+@collection_comment_router.get('/like/{comment_id}',
+                status_code=200, 
+                summary="코멘트 추천 여부 확인", 
+                description="[로그인 필요] comment_id를 받아 해당 코멘트가 추천되어 있는지 확인합니다.",
+            )
+def check_like_comment(
+    user: Annotated[User, Depends(login_with_header)],
+    comment_id: int,
+    collection_comment_service: Annotated[CollectionCommentService, Depends()],
+) -> bool:
+    return collection_comment_service.like_info(user.id, comment_id)

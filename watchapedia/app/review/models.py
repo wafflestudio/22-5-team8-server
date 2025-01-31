@@ -36,8 +36,8 @@ class UserLikesReview(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("user.id"), nullable=False
+        Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
     review_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("review.id"), nullable=False
+        Integer, ForeignKey("review.id", ondelete="CASCADE"), nullable=False
     )

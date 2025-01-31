@@ -8,6 +8,8 @@ from watchapedia.app.collection.views import collection_router
 from watchapedia.app.collection_comment.views import collection_comment_router
 from watchapedia.app.search.views import search_router
 from watchapedia.app.analysis.views import analysis_router
+from watchapedia.app.recommend.views import recommend_router
+from watchapedia.app.auth.views import auth_router
 
 api_router = APIRouter()
 
@@ -20,3 +22,5 @@ api_router.include_router(collection_router, prefix='/collections', tags=['colle
 api_router.include_router(collection_comment_router, prefix='/collection_comments', tags=['collection_comments'])
 api_router.include_router(search_router, prefix='/search', tags=['search'])
 api_router.include_router(analysis_router, prefix='/analysis', tags=['analysis'])
+api_router.include_router(recommend_router, prefix='/recommend', tags=['recommend'])
+api_router.include_router(auth_router, prefix='/auth', tags=['auth'])

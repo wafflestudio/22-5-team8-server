@@ -22,3 +22,4 @@ class MovieDataResponse(BaseModel):
     poster_url: str | None
     backdrop_url: str | None
     participants: list[ParticipantsDataResponse]
+    reviews_count: int

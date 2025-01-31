@@ -6,6 +6,7 @@ from watchapedia.app.user.service import UserService
 from watchapedia.app.participant.service import ParticipantService
 from watchapedia.app.collection.service import CollectionService
 from watchapedia.app.genre.repository import GenreRepository
+from watchapedia.common.errors import InvalidRangeError
 
 class SearchService():
     def __init__(self,
@@ -40,18 +41,33 @@ class SearchService():
         for key in self.movie_dict_by_genre:
             self.movie_dict_by_genre[key] = [movie.id for movie in self.movie_dict_by_genre[key]]
 
-    def process_search_response(self) -> SearchResponse:
-        movie_list = [i.id for i in self.movie_list]
-        user_list = [i.id for i in self.user_list]
-        participant_list = [i.id for i in self.participant_list]
-        collection_list = [i.id for i in self.collection_list]
+    def process_search_response(self, begin: int | None, end: int | None) -> SearchResponse:
+        movie_list = self._process_range([i.id for i in self.movie_list], begin, end)
+        user_list = self._process_range([i.id for i in self.user_list], begin, end)
+        participant_list = self._process_range([i.id for i in self.participant_list], begin, end)
+        collection_list = self._process_range(sorted([i.id for i in self.collection_list]), begin, end)
         collection_list.sort()
+
+        paginated_movie_dict_by_genre = {
+            genre: self._process_range(movies, begin, end)
+            for genre, movies in self.movie_dict_by_genre.items()
+        }
 
         return SearchResponse(
                 movie_list=movie_list,
                 user_list=user_list,
                 participant_list=participant_list,
                 collection_list=collection_list,
-                movie_dict_by_genre=self.movie_dict_by_genre
+                movie_dict_by_genre=paginated_movie_dict_by_genre
                 )
 
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]

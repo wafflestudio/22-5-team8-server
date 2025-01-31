@@ -44,17 +44,31 @@ def update_comment(
 
 @comment_router.get('/user',
                 status_code=200, 
-                summary="유저 코멘트 출력", 
-                description="유저가 남긴 모든 코멘트들을 반환합니다",
+                summary="자기 코멘트 출력", 
+                description="[로그인 필요] 자신이 남긴 모든 코멘트들을 반환합니다",
                 response_model=list[CommentResponse]
                 )
-def get_comments_by_user(
+def get_comments(
     user: Annotated[User, Depends(login_with_header)],
     comment_service: Annotated[CommentService, Depends()],
     begin: int | None = None,
     end: int | None = None,
 ):
     return comment_service.user_comments(user.id, begin, end)
+
+@comment_router.get('/user/{user_id}',
+                status_code=200, 
+                summary="유저 코멘트 출력", 
+                description="[로그인 불필요] user_id를 받아 해당 유저가 남긴 모든 코멘트들을 반환합니다",
+                response_model=list[CommentResponse]
+                )
+def get_comments_by_user(
+    user_id: int,
+    comment_service: Annotated[CommentService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
+):
+    return comment_service.user_comments(user_id, begin, end)
 
 @comment_router.get('/review/{review_id}',
                 status_code=200, 

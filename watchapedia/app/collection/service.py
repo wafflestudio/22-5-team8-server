@@ -2,22 +2,25 @@ from typing import Annotated
 from fastapi import Depends
 from datetime import datetime
 from watchapedia.app.collection.repository import CollectionRepository
+from watchapedia.app.collection_comment.repository import CollectionCommentRepository
 from watchapedia.app.collection.models import Collection
 from watchapedia.app.user.models import User
 from watchapedia.app.collection.dto.responses import CollectionResponse, MovieCompactResponse
 from watchapedia.app.movie.repository import MovieRepository
 from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.collection.errors import *
-from watchapedia.common.errors import PermissionDeniedError
+from watchapedia.common.errors import InvalidRangeError, PermissionDeniedError
 
 class CollectionService:
     def __init__(
             self, 
             movie_repository: Annotated[MovieRepository, Depends()], 
-            collection_repository: Annotated[CollectionRepository, Depends()]
+            collection_repository: Annotated[CollectionRepository, Depends()],
+            collection_comment_repository: Annotated[CollectionCommentRepository, Depends()]
     ) -> None:
         self.movie_repository = movie_repository
         self.collection_repository = collection_repository
+        self.collection_comment_repository = collection_comment_repository
 
     def create_collection(
             self, user_id: int, movie_ids: list[int] | None, title: str, overview: str | None
@@ -80,9 +83,9 @@ class CollectionService:
         updated_collection = self.collection_repository.like_collection(user_id, collection)
         return self._process_collection_response(updated_collection)
     
-    def get_user_collections(self, user: User) -> list[CollectionResponse]:
+    def get_user_collections(self, user: User, begin: int | None, end: int | None) -> list[CollectionResponse]:
         collections = self.collection_repository.get_collections_by_user_id(user.id)
-        return [ self._process_collection_response(collection) for collection in collections ]
+        return self._process_range([self._process_collection_response(collection) for collection in collections], begin, end)
     
     def search_collection_list(self, title: str) -> list[CollectionResponse] | None:
         collections = self.collection_repository.search_collection_list(title)
@@ -97,6 +100,12 @@ class CollectionService:
         if collection.user_id != user.id:
             raise PermissionDeniedError()
         self.collection_repository.delete_collection_by_id(collection)
+
+    def like_info(self, user_id: int, collection_id: int) -> bool:
+        collection = self.collection_repository.get_collection_by_collection_id(collection_id)
+        if collection is None:
+            raise CollectionNotFoundError()
+        return self.collection_repository.like_info(user_id, collection)
     
     def _process_collection_response(self, collection: Collection) -> CollectionResponse:
         return CollectionResponse(
@@ -117,3 +126,15 @@ class CollectionService:
                 for movie in collection.movies
             ]
         )
+    
+    def _process_range(self, response_list, begin: int | None, end: int | None) -> list[MovieCompactResponse]:
+        if begin is None :
+            begin = 0
+        if end is None or end > len(response_list) :
+            end = len(response_list)
+        if begin > len(response_list) :
+            begin = len(response_list)
+        if begin < 0 or begin > end :
+            raise InvalidRangeError()
+        return response_list[begin : end]
+

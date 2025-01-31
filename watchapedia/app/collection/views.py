@@ -71,9 +71,11 @@ def like_collection(
                     description="[로그인 필요] 유저가 만든 모든 컬렉션을 반환합니다.")
 def get_collections_by_user(
     user: Annotated[User, Depends(login_with_header)],
-    collection_service: Annotated[CollectionService, Depends()]
+    collection_service: Annotated[CollectionService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ) -> list[CollectionResponse]:
-    return collection_service.get_user_collections(user)
+    return collection_service.get_user_collections(user, begin, end)
 
 @collection_router.delete("/{collection_id}",
                         status_code=204,
@@ -93,10 +95,22 @@ def delete_collection(
 def search_collection_list(
     user_id: int,
     collection_service: Annotated[CollectionService, Depends()],
-    user_service: Annotated[UserService, Depends()]
+    user_service: Annotated[UserService, Depends()],
+    begin: int | None = None,
+    end: int | None = None,
 ):
     user = user_service.get_user_by_user_id(user_id)
     if user is None:
         raise UserNotFoundError()
-    return collection_service.get_user_collections(user)
+    return collection_service.get_user_collections(user, begin, end)
 
+@collection_router.get("/like/{collection_id}",
+                        status_code=200,
+                        summary="컬렉션 추천 여부 확인",
+                        description="[로그인 필요] 컬렉션 id를 받아 해당 컬렉션이 추천되어 있는지 확인합니다.")
+def check_like_collection(
+    user: Annotated[User, Depends(login_with_header)],
+    collection_id: int,
+    collection_service: Annotated[CollectionService, Depends()],
+):
+    return collection_service.like_info(user.id, collection_id)

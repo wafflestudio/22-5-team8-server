@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from watchapedia.database.connection import get_db_session
@@ -62,6 +62,13 @@ class ReviewRepository():
     def get_reviews_by_movie_id(self, movie_id: int) -> Sequence[Review]:
         reviews_list_query = select(Review).where(Review.movie_id == movie_id)
         return self.session.scalars(reviews_list_query).all()
+    
+    def get_reviews_count_by_movie_id(self, movie_id: int) -> int:
+        # content가 None인 리뷰는 제외
+        count_query = select(func.count()).where(
+            (Review.movie_id == movie_id) & (Review.content.isnot(None))
+        )
+        return self.session.scalar(count_query)
 
     def get_reviews_by_user_id(self, user_id: int) -> Sequence[Review]:
         reviews_list_query = select(Review).where(Review.user_id == user_id)

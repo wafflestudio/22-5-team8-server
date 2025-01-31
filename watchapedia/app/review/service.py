@@ -7,6 +7,7 @@ from watchapedia.app.movie.errors import MovieNotFoundError
 from watchapedia.app.analysis.service import UserRatingService, UserPreferenceService
 from watchapedia.app.review.dto.responses import ReviewResponse
 from watchapedia.app.review.repository import ReviewRepository
+from watchapedia.app.comment.repository import CommentRepository
 from watchapedia.app.review.models import Review
 from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
 from datetime import datetime
@@ -16,10 +17,12 @@ class ReviewService:
         movie_repository: Annotated[MovieRepository, Depends()],
         review_repository: Annotated[ReviewRepository, Depends()],
         user_rating_service: Annotated[UserRatingService, Depends()],
+        comment_repository: Annotated[CommentRepository, Depends()],
         user_preference_service: Annotated[UserPreferenceService, Depends()]
     ) -> None:
         self.movie_repository = movie_repository
         self.review_repository = review_repository
+        self.comment_repository = comment_repository
         self.user_rating_service = user_rating_service
         self.user_preference_service = user_preference_service
 
@@ -63,6 +66,12 @@ class ReviewService:
 
         return self._process_review_response(user_id, updated_review)
 
+
+    def get_review_by_user_and_movie(self, user_id: int, movie_id: int) -> ReviewResponse:
+        review = self.review_repository.get_review_by_user_and_movie(user_id, movie_id)
+        if review is None :
+            return None
+        return self._process_review_response(-1, review)
 
     def get_review(self, review_id: int) -> ReviewResponse:
         review = self.review_repository.get_review_by_review_id(review_id)
@@ -131,5 +140,6 @@ class ReviewService:
             created_at=review.created_at,
             spoiler=review.spoiler,
             status=review.status,
-            like=self.review_repository.like_info(user_id, review)
+            like=self.review_repository.like_info(user_id, review),
+            comments_count=self.comment_repository.get_comments_count_by_review_id(review.id)
         )
