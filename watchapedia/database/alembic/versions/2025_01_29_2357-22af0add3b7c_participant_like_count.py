@@ -1,7 +1,7 @@
 """participant like_count
 
 Revision ID: 22af0add3b7c
-Revises: 5e962e6ec768
+Revises: b2fc27df03b7
 Create Date: 2025-01-29 23:57:46.875723
 
 """
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '22af0add3b7c'
-down_revision: Union[str, None] = '5e962e6ec768'
+down_revision: Union[str, None] = 'b2fc27df03b7'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
