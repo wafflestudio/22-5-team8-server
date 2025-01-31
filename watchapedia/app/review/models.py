@@ -1,9 +1,11 @@
-from sqlalchemy import Integer, String, Float, ForeignKey, Boolean
+from sqlalchemy import Integer, String, Float, ForeignKey, Boolean, JSON
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
 from watchapedia.database.common import Base
 from sqlalchemy import DateTime
 from typing import TYPE_CHECKING
+from datetime import datetime
+
 if TYPE_CHECKING:
     from watchapedia.app.movie.models import Movie
     from watchapedia.app.user.models import User
@@ -18,7 +20,7 @@ class Review(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     spoiler: Mapped[bool] = mapped_column(Boolean, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=True)
-
+    view_date: Mapped[dict[str, bool]] = mapped_column(JSON, nullable=False, default=lambda: {datetime.now().strftime("%Y-%m-%d"): True})
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False
     )
@@ -30,6 +32,7 @@ class Review(Base):
     movie: Mapped["Movie"] = relationship("Movie", back_populates="reviews")
 
     comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="review", cascade="all, delete, delete-orphan")
+
 
 class UserLikesReview(Base):
     __tablename__ = 'user_likes_review'

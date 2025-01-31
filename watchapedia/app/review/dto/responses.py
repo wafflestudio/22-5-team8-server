@@ -13,6 +13,7 @@ class ReviewResponse(BaseModel):
     rating: float | None
     likes_count: int
     created_at: datetime
+    view_date: dict[str, bool] | None
     spoiler: bool
     status: str | None
     like: bool
