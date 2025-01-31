@@ -64,9 +64,9 @@ class ReviewRepository():
         return self.session.scalars(reviews_list_query).all()
     
     def get_reviews_count_by_movie_id(self, movie_id: int) -> int:
-        # content가 None인 리뷰는 제외
+        # content가 ""가 아니거나, null이 아닌 리뷰만 카운트
         count_query = select(func.count()).where(
-            (Review.movie_id == movie_id) & (Review.content.isnot(None))
+            (Review.movie_id == movie_id) & (Review.content.isnot(None)) & (Review.content != "")
         )
         return self.session.scalar(count_query)
 

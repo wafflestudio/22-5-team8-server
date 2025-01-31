@@ -200,6 +200,6 @@ class MovieService():
     def _count_ratings(self, reviews: list[Review]) -> int:
         rating_num = 0
         for review in reviews:
-            if review.rating is not None:
+            if review.rating is not None and review.rating != 0:
                 rating_num += 1
         return rating_num
