@@ -19,8 +19,6 @@ class RecommendService():
         self.movie_service = movie_service
         self.user_service = user_service
         self.review_service = review_service
-        self.movie_list = self.movie_service.search_movie_list("")
-        self.user_list = self.user_service.search_user_list("")
 
     def user_average_rating(self, user_id: int) -> int:
         user_review_list = self.review_service.user_reviews(user_id, None, None)
@@ -39,7 +37,8 @@ class RecommendService():
             return total_rating / rating_num
 
     def pcc(self, user_id: int, opp_id: int) -> int:
-        movie_id_list = [movie.id for movie in self.movie_list]
+        movie_list = self.movie_service.search_movie_list("")
+        movie_id_list = [movie.id for movie in movie_list]
         user_average = self.user_average_rating(user_id)
         opp_average = self.user_average_rating(opp_id)
 
@@ -68,10 +67,9 @@ class RecommendService():
         return numer / (user_denom ** 0.5 * opp_denom ** 0.5 + 0.0000001)
 
     def get_expected_rating(self, user_id: int):
-        if self.user_average_rating(user_id) < 0 :
-            raise NotEnoughRatingError()
-
-        user_id_list = [user.id for user in self.user_list]
+        user_list = self.user_service.search_user_list("")
+        user_id_list = [user.id for user in user_list]
+        movie_list = self.movie_service.search_movie_list("")
 
         pcc_dict = {}
 
@@ -80,7 +78,7 @@ class RecommendService():
 
         expected_dict = {}
 
-        for movie in self.movie_list :
+        for movie in movie_list :
             if movie.average_rating is None :
                 continue
 
