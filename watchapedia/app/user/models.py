@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from watchapedia.app.review.models import Review
     from watchapedia.app.comment.models import Comment
     from watchapedia.app.collection.models import Collection, CollectionComment
+    from watchapedia.app.analysis.models import UserRating, UserPreference
 
 class User(Base):
     __tablename__ = 'user'
@@ -27,7 +28,9 @@ class User(Base):
     collection_comments: Mapped[list["CollectionComment"]] = relationship(
         "CollectionComment", back_populates="user", cascade="all, delete, delete-orphan"
     )
-    
+    user_rating: Mapped["UserRating"] = relationship("UserRating", back_populates="user", uselist=False)
+    user_preference: Mapped["UserPreference"] = relationship("UserPreference", back_populates="user", uselist=False)
+
 class BlockedToken(Base):
     __tablename__ = "blocked_token"
 

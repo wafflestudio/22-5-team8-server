@@ -7,6 +7,7 @@ from watchapedia.app.user.models import User, BlockedToken, Follow, UserBlock
 from watchapedia.app.review.models import Review
 from watchapedia.app.comment.models import Comment
 from watchapedia.app.collection.models import Collection
+from watchapedia.app.analysis.models import UserRating, UserPreference
 from passlib.context import CryptContext
 from watchapedia.auth.utils import create_hashed_password
 from datetime import datetime
@@ -25,6 +26,9 @@ class UserRepository():
             hashed_pwd=create_hashed_password(login_password) # 암호화된 비밀번호 저장
         )
         self.session.add(user)
+
+        user.user_rating = UserRating(rating_num=0, rating_avg=None, rating_mode=None, rating_dist=None)
+        user.user_preference = UserPreference(actor_dict=None)
 
     def get_user(self, username: str, login_id: str) -> User | None:
         get_user_query = select(User).filter(
