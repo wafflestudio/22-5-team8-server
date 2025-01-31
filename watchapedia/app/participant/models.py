@@ -12,7 +12,7 @@ class Participant(Base):
     name: Mapped[str] = mapped_column(String(50), nullable=False)
     profile_url: Mapped[str | None] = mapped_column(String(500))
     biography: Mapped[str | None] = mapped_column(String(500), default=None)
-    likes_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    likes_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     movie_participants: Mapped[list["MovieParticipant"]] = relationship("MovieParticipant", back_populates="participant")
 
