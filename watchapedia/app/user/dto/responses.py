@@ -24,19 +24,14 @@ class UserProfileResponse(BaseModel):
     follower_count: int | None = None
     review_count: int | None = None
     collection_count: int | None = None
-    like_participant_list: list[ParticipantProfileResponse] | None = None
-    like_collection_list: list[CollectionResponse] | None = None
-    like_review_list: list[ReviewResponse] | None = None
 
     @staticmethod
     def from_user(user, 
                   following_count, 
                   follower_count, 
                   review_count, 
-                  collection_count,
-                  like_participant_list,
-                  like_collection_list,
-                  like_review_list) -> 'UserProfileResponse':
+                  collection_count
+                  ) -> 'UserProfileResponse':
         return UserProfileResponse(
             username=user.username, 
             login_id=user.login_id,
@@ -46,9 +41,6 @@ class UserProfileResponse(BaseModel):
             follower_count=follower_count,
             review_count=review_count,
             collection_count=collection_count,
-            like_participant_list=like_participant_list,
-            like_collection_list=like_collection_list,
-            like_review_list=like_review_list
         )
 class UserSigninResponse(BaseModel):
     access_token: str

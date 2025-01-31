@@ -147,10 +147,40 @@ def profile(
     follwer_count = user_service.get_followers_count(user_id)
     review_count = user_service.get_reviews_count(user_id)
     collection_count = user_service.get_collections_count(user_id)
-    like_participant_list = participant_service.get_like_participant_list(user_id)
-    like_collection_list = collection_service.get_like_collection_list(user_id)
-    like_review_list = review_service.get_like_review_list(user_id)
-    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count, like_participant_list, like_collection_list, like_review_list)
+    return UserProfileResponse.from_user(user, following_count, follwer_count, review_count, collection_count)
+
+@user_router.get('/likes_participant',
+                 status_code=200,
+                 summary="추천 인물 목록",
+                 description="[로그인 필요] 추천한 인물 목록을 반환합니다."
+                 )
+def likes_participant(
+    user: Annotated[User, Depends(login_with_header)],
+    participant_service: Annotated[ParticipantService, Depends()],
+):
+    return participant_service.get_like_participant_list(user.id)
+
+@user_router.get('/likes_collection', 
+                 status_code=200,
+                 summary="추천 컬렉션 목록",
+                 description="[로그인 필요] 추천한 컬렉션 목록을 반환합니다."
+                 )
+def likes_collection(
+    user: Annotated[User, Depends(login_with_header)],
+    collection_service: Annotated[CollectionService, Depends()],
+):
+    return collection_service.get_like_collection_list(user.id)
+
+@user_router.get('/likes_review',
+                 status_code=200,
+                 summary="추천 리뷰 목록",
+                 description="[로그인 필요] 추천한 리뷰 목록을 반환합니다."
+                 )
+def likes_review(
+    user: Annotated[User, Depends(login_with_header)],
+    review_service: Annotated[ReviewService, Depends()],
+):
+    return review_service.get_like_review_list(user.id)
 
 @user_router.get('/refresh', 
                 status_code=200, 
