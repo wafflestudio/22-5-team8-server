@@ -9,6 +9,7 @@ from watchapedia.app.collection_comment.views import collection_comment_router
 from watchapedia.app.search.views import search_router
 from watchapedia.app.recommend.views import recommend_router
 from watchapedia.app.auth.views import auth_router
+from watchapedia.app.calendar.views import calendar_router
 
 api_router = APIRouter()
 
@@ -22,3 +23,4 @@ api_router.include_router(collection_comment_router, prefix='/collection_comment
 api_router.include_router(search_router, prefix='/search', tags=['search'])
 api_router.include_router(recommend_router, prefix='/recommend', tags=['recommend'])
 api_router.include_router(auth_router, prefix='/auth', tags=['auth'])
+api_router.include_router(calendar_router, prefix='/calendar', tags=['calendar'])
