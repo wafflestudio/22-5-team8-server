@@ -14,7 +14,7 @@ KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize"
 @auth_router.get("/google")
 async def sigin_google():
     # scope : openid, profile, email
-    return RedirectResponse(url=f"{GOOGLE_AUTH_URL}?client_id={OAUTH_SETTINGS.google_client_id}&redirect_uri={OAUTH_SETTINGS.google_client_id}&response_type=code&scope=openid%20profile%20email")
+    return RedirectResponse(url=f"{GOOGLE_AUTH_URL}?client_id={OAUTH_SETTINGS.google_client_id}&redirect_uri={OAUTH_SETTINGS.google_redirect_uri}&response_type=code&scope=openid%20profile%20email")
 
 @auth_router.get("/google/callback")
 async def signin_google(
