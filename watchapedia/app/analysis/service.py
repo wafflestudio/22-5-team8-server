@@ -31,10 +31,10 @@ class UserPreferenceService():
         self.genre_repository = genre_repository
 
     def get_transform_dict(self,
-            actor_dict: OrderedDict,
-            director_dict: OrderedDict,
-            genre_dict: OrderedDict,
-            country_dict: OrderedDict
+            actor_dict: OrderedDict | None,
+            director_dict: OrderedDict | None,
+            genre_dict: OrderedDict | None,
+            country_dict: OrderedDict | None
             ) -> tuple[OrderedDict]:
 
         actor_dict_transform = OrderedDict()
