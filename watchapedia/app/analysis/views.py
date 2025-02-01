@@ -49,10 +49,10 @@ def analysis(
         country_dict = user_preference.country_dict
         genre_dict = user_preference.genre_dict
 
-        actor_dict_sorted = OrderedDict(sorted(actor_dict.items(), reverse=True)[:10])
-        director_dict_sorted = OrderedDict(sorted(director_dict.items(), reverse=True)[:10])
-        country_dict_sorted = OrderedDict(sorted(country_dict.items(), reverse=True)[:10])
-        genre_dict_sorted = OrderedDict(sorted(genre_dict.items(), reverse=True)[:10])
+        actor_dict_sorted = None if actor_dict is None else OrderedDict(sorted(actor_dict.items(), reverse=True)[:10])
+        director_dict_sorted = None if director_dict is None else OrderedDict(sorted(director_dict.items(), reverse=True)[:10])
+        country_dict_sorted = None if country_dict is None else OrderedDict(sorted(country_dict.items(), reverse=True)[:10])
+        genre_dict_sorted = None if genre_dict is None else OrderedDict(sorted(genre_dict.items(), reverse=True)[:10])
 
         return UserPreferenceResponse(
                 id=user_preference.id,
