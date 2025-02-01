@@ -5,7 +5,7 @@
 
 ## 배포 링크
 프론트엔드 배포 링크: https://d1xtmfti6ypide.cloudfront.net/
-<br>백엔드 배포 링크: http://3.39.11.124/
+<br>백엔드 배포 링크: http://3.39.11.124:8000/
 
 ## ❓ About The Project
 Wachapedia는 [**왓챠피디아**](https://pedia.watcha.com/ko-KR/)의 클론 프로젝트입니다.
