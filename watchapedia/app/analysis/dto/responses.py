@@ -6,7 +6,7 @@ class UserRatingResponse(BaseModel):
     user_id: int
     rating_num: int
     rating_avg: float | None
-    rating_dist: dict[float, int]
+    rating_dist: dict[float, int] | None
     rating_mode: float | None
     rating_message: str | None
     viewing_time: int | None
