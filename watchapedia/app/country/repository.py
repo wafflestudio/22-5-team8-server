@@ -30,3 +30,7 @@ class CountryRepository():
     def get_country_by_country_name(self, name: str) -> Country | None:
         get_country_query = select(Country).filter(Country.name == name)
         return self.session.scalar(get_country_query)
+
+    def get_country_by_id(self, country_id: int) -> Country | None:
+        get_country_query = select(Country).filter(Country.id == country_id)
+        return self.session.scalar(get_country_query)
