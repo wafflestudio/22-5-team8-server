@@ -83,7 +83,7 @@ class UserPreferenceService():
 
 
         user_preference = self.user_preference_repository.get_user_preference_by_user_id(user_id)
-        actor_dict, director_dict, country_dict, genre_dict = self.user_preference_repository.update_user_preference_actor(user_id, movie_id, user_rating, review_list)
+        actor_dict, director_dict, genre_dict, country_dict = self.user_preference_repository.update_user_preference_actor(user_id, movie_id, user_rating, review_list)
         self.user_preference_repository.update_preference(user_preference, actor_dict, director_dict, country_dict, genre_dict) # UserPreferece 반환(우선은 None처리)
         #self.user_preference_repository.update_preference(user_preference, test)
 
