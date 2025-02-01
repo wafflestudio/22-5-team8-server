@@ -54,10 +54,12 @@ def analysis(
         country_dict_sorted = None if country_dict is None else OrderedDict(sorted(country_dict.items(), reverse=True)[:10])
         genre_dict_sorted = None if genre_dict is None else OrderedDict(sorted(genre_dict.items(), reverse=True)[:10])
 
+        actor_dict_transform, director_dict_transform, genre_dict_transform, country_dict_transform = user_preference_service.get_transform_dict(actor_dict_sorted, director_dict_sorted, country_dict_sorted, genre_dict_sorted)
+        
         return UserPreferenceResponse(
                 id=user_preference.id,
                 user_id=user_id,
-                actor_dict=actor_dict_sorted,
-                director_dict=director_dict_sorted,
-                country_dict=country_dict_sorted,
-                genre_dict=genre_dict_sorted)
+                actor_dict=actor_dict_transform,
+                director_dict=director_dict_transform,
+                country_dict=country_dict_transform,
+                genre_dict=genre_dict_transform)

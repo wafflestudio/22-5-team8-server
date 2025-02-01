@@ -6,16 +6,70 @@ from watchapedia.app.analysis.dto.responses import UserRatingResponse
 from watchapedia.app.analysis.repository import UserPreferenceRepository
 from watchapedia.app.review.repository import ReviewRepository
 
+from collections import OrderedDict  
+from watchapedia.app.user.repository import UserRepository 
+from watchapedia.app.participant.repository import ParticipantRepository 
+from watchapedia.app.genre.repository import GenreRepository 
+from watchapedia.app.country.repository import CountryRepository 
+
 class UserPreferenceService():
     def __init__(self,
             user_preference_repository: Annotated[UserPreferenceRepository, Depends()],
             review_repository: Annotated[ReviewRepository, Depends()],
-            user_rating_repository: Annotated[UserRatingRepository, Depends()]
+            user_rating_repository: Annotated[UserRatingRepository, Depends()],
+            user_repository: Annotated[UserRepository, Depends()],
+            participant_repository: Annotated[ParticipantRepository, Depends()],
+            country_repository: Annotated[CountryRepository, Depends()],
+            genre_repository: Annotated[GenreRepository, Depends()]     
             ) -> None:
         self.user_preference_repository = user_preference_repository
         self.review_repository = review_repository
         self.user_rating_repository = user_rating_repository
+        self.user_repository = user_repository
+        self.participant_repository = participant_repository
+        self.country_repository = country_repository
+        self.genre_repository = genre_repository
 
+    def get_transform_dict(self,
+            actor_dict: OrderedDict | None,
+            director_dict: OrderedDict | None,
+            genre_dict: OrderedDict | None,
+            country_dict: OrderedDict | None
+            ) -> tuple[OrderedDict]:
+
+        actor_dict_transform = OrderedDict()
+        director_dict_transform = OrderedDict()
+        genre_dict_transform = OrderedDict()
+        country_dict_transform = OrderedDict()
+        if actor_dict == None or len(actor_dict) == 0:
+            actor_dict_transform = None
+        else:
+            for actor_id, value in actor_dict.items():
+                actor = self.participant_repository.get_participant_by_id(actor_id)
+                actor_dict_transform[actor.name] = value
+        if director_dict == None or len(director_dict)==0:
+
+            director_dict_transform = None
+        else:
+            for director_id, value in director_dict.items():
+                director = self.participant_repository.get_participant_by_id(director_id)
+                director_dict_transform[director.name] = value
+
+        if genre_dict == None or len(genre_dict)==0:
+            genre_dict_transform = None
+        else:
+            for genre_id, value in genre_dict.items():
+                genre = self.genre_repository.get_genre_by_id(genre_id)
+                genre_dict_transform[genre.name] = value
+
+        if country_dict == None or len(country_dict)==0:
+            country_dict_transform = None
+        else:
+            for country_id, value in country_dict.items():
+                country = self.country_repository.get_country_by_id(country_id)
+                country_dict_transform[country.name] =value
+        return (actor_dict_transform, director_dict_transform, genre_dict_transform, country_dict_transform)
+    
     def update_preference(self,
             user_id,
             review_id,

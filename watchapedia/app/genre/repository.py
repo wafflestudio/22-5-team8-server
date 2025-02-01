@@ -43,3 +43,7 @@ class GenreRepository():
         #get_genre_query = select(Genre).filter(Genre.name.contains(name))
         #return self.session.scalars(get_genre_query).all()
 
+    def get_genre_by_id(self, genre_id: int) -> Genre | None:
+        get_genre_query = select(Genre).filter(Genre.id == genre_id)
+        return self.session.scalar(get_genre_query)
+
