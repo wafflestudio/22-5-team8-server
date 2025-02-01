@@ -1,7 +1,7 @@
 """like_count default 0
 
 Revision ID: 56b0a26e0de1
-Revises: 3a1328561655
+Revises: 84b0d6c1b6dd
 Create Date: 2025-01-31 17:32:31.867851
 
 """
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '56b0a26e0de1'
-down_revision: Union[str, None] = '3a1328561655'
+down_revision: Union[str, None] = '84b0d6c1b6dd'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
