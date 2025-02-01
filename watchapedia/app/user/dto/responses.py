@@ -59,3 +59,9 @@ class BlockedUsersResponse(BaseModel):
         return BlockedUsersResponse(
             id=users
         )
+    
+class UserFollowResponse(BaseModel):
+    id: int
+    username: str
+    login_id: str
+    profile_url: str | None = None
