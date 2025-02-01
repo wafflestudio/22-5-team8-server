@@ -36,17 +36,10 @@ class RecommendService():
         else :
             return total_rating / rating_num
 
-    def pcc(self, user_id: int, opp_id: int) -> int:
+    def pcc(self, user_id: int, user_dict, user_average: int, opp_id: int) -> int:
         movie_list = self.movie_service.search_movie_list("")
         movie_id_list = [movie.id for movie in movie_list]
-        user_average = self.user_average_rating(user_id)
         opp_average = self.user_average_rating(opp_id)
-
-        user_review_list = self.review_service.user_reviews(user_id, None, None)
-        user_dict = {}
-        for review in user_review_list :
-            if review.rating is not None and review.rating > 0 :
-                user_dict[review.movie_id] = review.rating
 
         opp_review_list = self.review_service.user_reviews(opp_id, None, None)
         opp_dict = {}
@@ -70,16 +63,27 @@ class RecommendService():
         user_list = self.user_service.search_user_list("")
         user_id_list = [user.id for user in user_list]
         movie_list = self.movie_service.search_movie_list("")
+        user_average = self.user_average_rating(user_id)
+
+        user_review_list = self.review_service.user_reviews(user_id, None, None)
+        user_dict = {}
+        for review in user_review_list :
+            if review.rating is not None and review.rating > 0 :
+                user_dict[review.movie_id] = review.rating
 
         pcc_dict = {}
 
         for opp_id in user_id_list :
-            pcc_dict[opp_id] = self.pcc(user_id, opp_id)
+            pcc_dict[opp_id] = self.pcc(user_id, user_dict, user_average, opp_id)
 
         expected_dict = {}
 
         for movie in movie_list :
             if movie.average_rating is None :
+                continue
+
+            if user_average < 0 :
+                expected_dict[movie.id] = movie.average_rating
                 continue
 
             numer = 0
@@ -88,16 +92,15 @@ class RecommendService():
             review = self.review_service.get_review_by_user_and_movie(user_id, movie.id)
             if review is None :
                 for u_id in user_id_list :
-                    if u_id != user_id and self.user_average_rating(u_id) >= 0 :
+                    u_average = self.user_average_rating(u_id)
+                    if u_id != user_id and u_average >= 0 :
                         denom += abs(pcc_dict[u_id])
                         u_review = self.review_service.get_review_by_user_and_movie(u_id, movie.id)
                         if u_review is not None and u_review.rating is not None and u_review.rating > 0 :
-                            numer += pcc_dict[u_id] * (u_review.rating - self.user_average_rating(u_id))
+                            numer += pcc_dict[u_id] * (u_review.rating - u_average)
             
-                if self.user_average_rating(user_id) >= 0 :
-                    expected_dict[movie.id] = self.user_average_rating(user_id) + (numer / denom)
-                else :
-                    expected_dict[movie.id] = movie.average_rating
+                if user_average >= 0 :
+                    expected_dict[movie.id] = user_average + (numer / denom)
 
         return expected_dict
 
