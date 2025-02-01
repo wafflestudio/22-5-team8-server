@@ -11,6 +11,7 @@ from passlib.context import CryptContext
 from watchapedia.auth.utils import create_hashed_password
 from datetime import datetime
 from watchapedia.app.user.errors import UserAlreadyExistsError
+from watchapedia.app.analysis.models import UserRating, UserPreference
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -32,6 +33,9 @@ class UserRepository():
             profile_url=profile_url
         )
         self.session.add(user)
+        
+        user.user_rating = UserRating(rating_num=0, rating_avg=None, rating_mode=None, rating_dist=None)
+        user.user_preference = UserPreference(actor_dict=None)
 
     def get_user(self, username: str, login_id: str) -> User | None:
         get_user_query = select(User).filter(
