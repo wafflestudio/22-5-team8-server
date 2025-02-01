@@ -120,7 +120,7 @@ def followings(
     user_service: Annotated[UserService, Depends()],
     begin: int | None = None,
     end: int | None = None,
-) -> list[MyProfileResponse]:
+):
     return user_service.get_followings(user_id, begin, end)
 
 @user_router.get('/followers/{user_id}', status_code=200, summary="팔로워 목록", description="user_id를 받아 해당 유저를 팔로우하는 유저들의 목록을 반환합니다.")

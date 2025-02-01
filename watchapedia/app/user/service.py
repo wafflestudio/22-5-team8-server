@@ -45,13 +45,13 @@ class UserService:
             raise UserAlreadyNotFollowingError()
         self.user_repository.unfollow(follower_id, following_id)
     
-    def get_followings(self, user_id: int, begin: int | None, end: int | None) -> list[MyProfileResponse]:
+    def get_followings(self, user_id: int, begin: int | None, end: int | None) -> list[UserFollowResponse]:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users= self.user_repository.get_followings(user_id)
         return self._process_range([self._process_user_follow_response(user) for user in users], begin, end)
     
-    def get_followers(self, user_id: int, begin: int | None, end: int | None) -> list[MyProfileResponse]:
+    def get_followers(self, user_id: int, begin: int | None, end: int | None) -> list[UserFollowResponse]:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users = self.user_repository.get_followers(user_id)
