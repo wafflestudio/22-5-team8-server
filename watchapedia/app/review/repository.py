@@ -6,7 +6,8 @@ from typing import Annotated, Sequence
 from watchapedia.app.user.models import User
 from watchapedia.app.review.models import Review, UserLikesReview
 from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
-from datetime import datetime
+from datetime import datetime, date
+from sqlalchemy.orm.attributes import flag_modified
 
 class ReviewRepository():
     def __init__(self, session: Annotated[Session, Depends(get_db_session)]) -> None:
@@ -55,6 +56,19 @@ class ReviewRepository():
         if status is not None :
             review.status = status
         
+        self.session.flush()
+
+        return review
+    
+    def add_view_date(self, review: Review, new_view_date: str) -> Review:
+        review.view_date[new_view_date] = True
+        flag_modified(review, "view_date")
+        self.session.flush()
+        return review
+    
+    def delete_view_date(self, review, delete_view_date: str) -> Review:
+        del review.view_date[delete_view_date]
+        flag_modified(review, "view_date")
         self.session.flush()
 
         return review

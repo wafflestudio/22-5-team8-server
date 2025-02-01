@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from datetime import datetime
 from watchapedia.app.user.views import login_with_header
 from watchapedia.app.user.models import User
-from watchapedia.app.review.dto.requests import ReviewCreateRequest, ReviewUpdateRequest
+from watchapedia.app.review.dto.requests import ReviewCreateRequest, ReviewUpdateRequest, validate_date_query
 from watchapedia.app.review.dto.responses import ReviewResponse
 from watchapedia.app.review.models import Review
 from watchapedia.app.review.service import ReviewService
@@ -41,6 +41,39 @@ def update_review(
     return review_service.update_review(
         user.id, review_id, review.content, review.rating, review.spoiler, review.status
     )
+
+
+@review_router.post('/date/{review_id}',
+                status_code=200,
+                summary="본 날짜추가",
+                description="review_id와 새로운 날짜를 받아 view_date에 추가합니다.",
+                response_model=ReviewResponse
+                )
+def add_view_date(
+        user: Annotated[User, Depends(login_with_header)],
+        review_id: int,
+        review_service: Annotated[ReviewService, Depends()],
+        new_view_date: Annotated[str, Query(..., description="추가할 날짜 (YYYY-MM-DD)")]
+        ):
+    new_view_date = validate_date_query(new_view_date)
+    return review_service.add_view_date(
+            user.id, review_id, new_view_date)
+
+
+@review_router.delete('/date/{review_id}',
+                status_code=204,
+                summary="본 날짜삭제",
+                description="review_id와 삭제할 날짜를 받아 view_date에 삭제합니다."
+                )
+def delete_view_date(
+        user: Annotated[User, Depends(login_with_header)],
+        review_id: int,
+        review_service: Annotated[ReviewService, Depends()],
+        delete_view_date: Annotated[str, Query(..., description="삭제할 날짜 (YYYY-MM-DD)")]
+        ):
+    delete_view_date = validate_date_query(delete_view_date)
+    review_service.delete_view_date(user.id, review_id, delete_view_date)
+
 
 @review_router.get('/user',
                 status_code=200, 

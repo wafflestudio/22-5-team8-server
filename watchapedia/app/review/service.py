@@ -9,7 +9,7 @@ from watchapedia.app.review.repository import ReviewRepository
 from watchapedia.app.comment.repository import CommentRepository
 from watchapedia.app.review.models import Review
 from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
-from datetime import datetime
+from datetime import datetime, date
 
 class ReviewService:
     def __init__(self,
@@ -52,7 +52,32 @@ class ReviewService:
         self.movie_repository.update_average_rating(movie)
 
         return self._process_review_response(user_id, updated_review)
+    
+    def add_view_date(self, user_id: int, review_id: int, new_view_date: date) -> ReviewResponse:
+        review = self.review_repository.get_review_by_review_id(review_id)
+        view_date = review.view_date
 
+        # date -> str 변환
+        new_view_date = new_view_date.strftime("%Y-%m-%d") 
+        if new_view_date not in view_date.keys():
+            updated_review = self.review_repository.add_view_date(review, new_view_date)
+        else:
+            raise InvalidRangeError() # 존재하는 시청날짜 
+        return self._process_review_response(user_id, updated_review)
+
+    def delete_view_date(self, user_id: int, review_id: int, delete_view_date: date) -> ReviewResponse:
+        review = self.review_repository.get_review_by_review_id(review_id)
+        view_date = review.view_date
+        # date -> str 변환
+        delete_view_date = delete_view_date.strftime("%Y-%m-%d")
+        if delete_view_date in view_date.keys():
+            if len(view_date) == 1:
+                raise InvalidRangeError() # 시청기록1회는삭제불가 
+            else:
+                updated_review = self.review_repository.delete_view_date(review, delete_view_date)
+        else:
+            raise InvalidRangeError() # 해당날짜 시청기록없음 
+        return self._process_review_response(user_id, updated_review)
 
     def get_review_by_user_and_movie(self, user_id: int, movie_id: int) -> ReviewResponse:
         review = self.review_repository.get_review_by_user_and_movie(user_id, movie_id)
@@ -125,6 +150,7 @@ class ReviewService:
             rating=review.rating,
             likes_count=review.likes_count,
             created_at=review.created_at,
+            view_date=review.view_date,
             spoiler=review.spoiler,
             status=review.status,
             like=self.review_repository.like_info(user_id, review),
