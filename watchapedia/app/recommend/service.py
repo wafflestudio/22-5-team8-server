@@ -114,11 +114,11 @@ class RecommendService():
 
         if len(expected_dict) > 0 :
             expected_list = sorted(expected_dict.items(), key = lambda x: x[1], reverse=True)
-            for expected in expected_list :
+            for expected in expected_list[:list_size] :
                 movie = self.movie_service.search_movie(expected[0])
                 response_list.append(self._process_recommend_response(movie, expected[1]))
 
-        return response_list[:list_size]
+        return response_list
 
     def high_difference(self, user_id: int, list_size: int) -> list[RecommendResponse]:
         expected_dict = self.get_expected_rating(user_id)
@@ -131,11 +131,11 @@ class RecommendService():
         
         if len(difference_dict) > 0 :
             difference_list = sorted(difference_dict.items(), key = lambda x: x[1], reverse=True)
-            for difference in difference_list :
+            for difference in difference_list[:list_size] :
                 movie = self.movie_service.search_movie(difference[0])
                 response_list.append(self._process_recommend_response(movie, expected_dict[difference[0]]))
 
-        return response_list[:list_size]
+        return response_list
 
     def _process_recommend_response(self, movie: Movie, expected_rating: float) -> RecommendResponse:
         return RecommendResponse(
