@@ -125,7 +125,7 @@ class UserPreferenceRepository():
             )
             movie_count_director = result[0]
             rating_director = result[1]
-            rating_dir_dict[participant_id] = (movie_count_actor, rating_actor)
+            rating_dir_dict[participant_id] = (movie_count_director, rating_director)
 
         for genre_id in genre_list: 
             result = (
