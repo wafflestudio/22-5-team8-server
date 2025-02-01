@@ -62,9 +62,9 @@ class RecommendService():
     def get_expected_rating(self, user_id: int):
         user_list = self.user_service.search_user_list("")
         user_id_list = [user.id for user in user_list]
-        user_id_list = user_id_list[0:50]
+        user_id_list = user_id_list[0:20]
         movie_list = self.movie_service.search_movie_list("")
-        movie_list = movie_list[0:50]
+        movie_list = movie_list[0:20]
         user_average = self.user_average_rating(user_id)
 
         user_review_list = self.review_service.user_reviews(user_id, None, None)
@@ -75,8 +75,9 @@ class RecommendService():
 
         pcc_dict = {}
 
-        for opp_id in user_id_list :
-            pcc_dict[opp_id] = self.pcc(user_id, user_dict, user_average, opp_id)
+        if user_average > 0 :
+            for opp_id in user_id_list :
+                pcc_dict[opp_id] = self.pcc(user_id, user_dict, user_average, opp_id)
 
         expected_dict = {}
 
@@ -84,7 +85,7 @@ class RecommendService():
             if movie.average_rating is None :
                 continue
 
-            if user_average < 0 :
+            if user_average <= 0 :
                 expected_dict[movie.id] = movie.average_rating
                 continue
 
