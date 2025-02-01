@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, select, cast, Float
+from sqlalchemy import func, select, cast, Float, or_
 from fastapi import Depends
 
 from watchapedia.database.connection import get_db_session
@@ -61,7 +61,11 @@ class UserPreferenceRepository():
                 self.session.query(Participant.id)
                 .join(MovieParticipant)
                 .filter(MovieParticipant.movie_id == movie_id)
-                .filter(MovieParticipant.role == "배우")
+                .filter(or_(
+                MovieParticipant.role.like("%주연%"),
+                MovieParticipant.role.like("%조연%"),
+                MovieParticipant.role.like("%단역%")
+                ))
                 .all()] #OK
 
         director_list = [
@@ -103,7 +107,11 @@ class UserPreferenceRepository():
                 )
                 .join(MovieParticipant, Review.movie_id == MovieParticipant.movie_id)
                 .filter(MovieParticipant.participant_id == participant_id)
-                .filter(MovieParticipant.role.like("%배우%"))
+                .filter(or_(
+                MovieParticipant.role.like("%주연%"),
+                MovieParticipant.role.like("%조연%"),
+                MovieParticipant.role.like("%단역%")
+                ))
                 .filter(MovieParticipant.movie_id.in_(review_movie_ids))  # 리뷰에 있는 영화만 선택
                 .one()  # 단일 결과 반환
             )
