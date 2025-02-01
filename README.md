@@ -10,7 +10,7 @@
 </div>
 
 ## 배포 링크
-프론트엔드 배포 링크: https://d1xtmfti6ypide.cloudfront.net/
+프론트엔드 배포 링크: https://d2vsqxcvld4zf7.cloudfront.net (모바일로 들어가는 걸 추천 드립니다)
 <br>백엔드 배포 링크: http://3.39.11.124:8000/
 
 ## ❓ About The Project
