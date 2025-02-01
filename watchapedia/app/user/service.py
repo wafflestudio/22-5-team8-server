@@ -3,7 +3,7 @@ from watchapedia.app.user.repository import UserRepository
 from fastapi import Depends
 from watchapedia.common.errors import InvalidCredentialsError, InvalidRangeError, InvalidTokenError, BlockedTokenError
 from watchapedia.app.user.errors import UserAlreadyExistsError, UserNotFoundError, UserAlreadyFollowingError, UserAlreadyNotFollowingError, CANNOT_FOLLOW_MYSELF_Error, CANNOT_BLOCK_MYSELF_Error, UserBlockedError, UserNotBlockedError
-from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse
+from watchapedia.app.user.dto.responses import MyProfileResponse, UserResponse, UserFollowResponse
 from watchapedia.auth.utils import verify_password
 from watchapedia.app.user.models import User
 from watchapedia.auth.utils import create_access_token, create_refresh_token, decode_token
@@ -49,13 +49,13 @@ class UserService:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users= self.user_repository.get_followings(user_id)
-        return self._process_range([self._process_user_response(user) for user in users], begin, end)
+        return self._process_range([self._process_user_follow_response(user) for user in users], begin, end)
     
     def get_followers(self, user_id: int, begin: int | None, end: int | None) -> list[MyProfileResponse]:
         if self.get_user_by_user_id(user_id) is None:
             raise UserNotFoundError()
         users = self.user_repository.get_followers(user_id)
-        return self._process_range([self._process_user_response(user) for user in users], begin, end)
+        return self._process_range([self._process_user_follow_response(user) for user in users], begin, end)
     
     def get_followings_count(self, user_id: int) -> int:
         return self.user_repository.get_followings_count(user_id)
@@ -145,6 +145,14 @@ class UserService:
     
     def _process_user_response(self, user: User) -> MyProfileResponse:
         return MyProfileResponse(
+            username=user.username,
+            login_id=user.login_id,
+            profile_url=user.profile_url
+            )
+    
+    def _process_user_follow_response(self, user: User) -> UserFollowResponse:
+        return UserFollowResponse(
+            id=user.id,
             username=user.username,
             login_id=user.login_id,
             profile_url=user.profile_url
