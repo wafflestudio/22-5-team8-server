@@ -15,7 +15,7 @@ class UserRatingResponse(BaseModel):
 class UserPreferenceResponse(BaseModel):
     id: int
     user_id: int
-    actor_dict: OrderedDict[int, tuple[float, int]] | None
-    director_dict: OrderedDict[int, tuple[float, int]] | None
-    country_dict: OrderedDict[int, tuple[float, int]] | None
-    genre_dict: OrderedDict[int, tuple[float, int]] | None
+    actor_dict: OrderedDict[str, tuple[float, int]] | None
+    director_dict: OrderedDict[str, tuple[float, int]] | None
+    country_dict: OrderedDict[str, tuple[float, int]] | None
+    genre_dict: OrderedDict[str, tuple[float, int]] | None
