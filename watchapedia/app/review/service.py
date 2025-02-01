@@ -10,16 +10,22 @@ from watchapedia.app.comment.repository import CommentRepository
 from watchapedia.app.review.models import Review
 from watchapedia.app.review.errors import RedundantReviewError, ReviewNotFoundError
 from datetime import datetime, date
+from watchapedia.app.analysis.service import UserRatingService, UserPreferenceService
 
 class ReviewService:
     def __init__(self,
         movie_repository: Annotated[MovieRepository, Depends()],
         review_repository: Annotated[ReviewRepository, Depends()],
-        comment_repository: Annotated[CommentRepository, Depends()]
+        comment_repository: Annotated[CommentRepository, Depends()],
+        user_rating_service: Annotated[UserRatingService, Depends()],
+        user_preference_service: Annotated[UserPreferenceService, Depends()]
     ) -> None:
         self.movie_repository = movie_repository
         self.review_repository = review_repository
         self.comment_repository = comment_repository
+
+        self.user_rating_service = user_rating_service
+        self.user_preference_service = user_preference_service
 
     def create_review(self, user_id: int, movie_id: int, content: str | None,
                     rating: float | None, spoiler: bool, status: str | None
@@ -36,6 +42,9 @@ class ReviewService:
                                                         created_at=datetime.now(), spoiler=spoiler, status=status)
         self.movie_repository.update_average_rating(movie)
 
+        self.user_rating_service.update_rating(user_id)
+        self.user_preference_service.update_preference(user_id, new_review.id)
+
         return self._process_review_response(user_id, new_review)
 
     def update_review(self, user_id: int, review_id: int, content: str | None,
@@ -50,6 +59,9 @@ class ReviewService:
         updated_review = self.review_repository.update_review(review, content=content, rating=rating,
                                                             spoiler=spoiler, status=status)
         self.movie_repository.update_average_rating(movie)
+
+        self.user_rating_service.update_rating(user_id)
+        self.user_preference_service.update_preference(user_id, review_id)
 
         return self._process_review_response(user_id, updated_review)
     
@@ -125,7 +137,12 @@ class ReviewService:
             raise ReviewNotFoundError()
         if review.user_id != user_id:
             raise PermissionDeniedError()
+
+        movie_id = review.movie_id # 삭제전 movie_id 저장
         self.review_repository.delete_review_by_id(review)
+
+        self.user_rating_service.update_rating(user_id)
+        self.user_preference_service.update_preference(user_id, review_id, delete=True, movie_id=movie_id)
 
 
     def _process_range(self, response_list, begin: int | None, end: int | None) -> list[ReviewResponse]:
