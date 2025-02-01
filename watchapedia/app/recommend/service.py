@@ -63,7 +63,7 @@ class RecommendService():
         user_list = self.user_service.search_user_list("")
         user_id_list = [user.id for user in user_list]
         user_id_list = user_id_list[0:50]
-        movie_list = self.movie_service.siearch_movie_list("")
+        movie_list = self.movie_service.search_movie_list("")
         movie_list = movie_list[0:50]
         user_average = self.user_average_rating(user_id)
 
