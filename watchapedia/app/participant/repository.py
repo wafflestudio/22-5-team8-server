@@ -86,6 +86,14 @@ class ParticipantRepository():
 
         return participant
     
+    def like_info(self, user_id: int, participant: Participant) -> bool:
+        get_participant_like_query = select(UserLikesParticipant).filter(
+            (UserLikesParticipant.user_id == user_id)
+            & (UserLikesParticipant.participant_id == participant.id)
+        )
+        user_likes_participant = self.session.scalar(get_participant_like_query)
+        return user_likes_participant is not None
+    
     def get_like_participant_list(self, user_id: int) -> list[Participant]:
         get_like_participant_query = select(Participant).join(UserLikesParticipant, Participant.id == UserLikesParticipant.participant_id).filter(
             UserLikesParticipant.user_id == user_id

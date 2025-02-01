@@ -59,6 +59,12 @@ class ParticipantService():
         updated_participant = self.participant_repository.like_participant(user_id, participant)
         return self._process_participant(updated_participant)
     
+    def like_info(self, user_id: int, participant_id: int) -> bool:
+        participant = self.participant_repository.get_participant_by_id(participant_id)
+        if participant is None:
+            raise ParticipantNotFoundError()
+        return self.participant_repository.like_info(user_id, participant)
+    
     def get_like_participant_list(self, user_id: int) -> list[ParticipantProfileResponse]:
         participants = self.participant_repository.get_like_participant_list(user_id)
         return [self._process_participant(participant) for participant in participants]

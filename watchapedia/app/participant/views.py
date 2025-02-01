@@ -67,3 +67,15 @@ def like_participant(
     participant_service: Annotated[ParticipantService, Depends()],
 ):
     return participant_service.like_participant(user.id, participant_id)
+
+@participant_router.get('/like/{participant_id}',
+                    status_code=200, 
+                    summary="인물 추천 여부 확인", 
+                    description="[로그인 필요]인물 id를 받아 해당 인물이 추천되어 있는지 여부를 반환합니다.",
+                    )
+def check_like_participant(
+    user: Annotated[User, Depends(login_with_header)],
+    participant_id: int,
+    participant_service: Annotated[ParticipantService, Depends()],
+) -> bool:
+    return participant_service.like_info(user.id, participant_id)
