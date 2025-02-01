@@ -264,7 +264,6 @@ class UserPreferenceRepository():
         else:
             merged_country_dict = country_dict_cur
 
-        print('merged_actor_dict', merged_actor_dict)
         if merged_actor_dict == None:
             actor_dict_update = None
         else:
@@ -281,7 +280,6 @@ class UserPreferenceRepository():
             country_dict_update = None
         else:
             country_dict_update = dict(sorted(merged_country_dict.items(), key=lambda item: item[1][0], reverse=True))
-        print('actor_dict_update', actor_dict_update)
 
         return (actor_dict_update, director_dict_update, genre_dict_update, country_dict_update)
 
@@ -347,8 +345,6 @@ class UserRatingRepository():
             .filter(Review.user_id == user_id)  # 특정 유저가 작성한 리뷰만 선택
             .scalar()  # 단일 값 반환
         )
-
-        print(total_running_time)
 
         if total_running_time == None:
             return 0
