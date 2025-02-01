@@ -1,3 +1,9 @@
+<img src="https://img.shields.io/github/contributors/wafflestudio/22-5-team8-server?color=yellow">
+<img src="https://img.shields.io/github/commit-activity/t/wafflestudio/22-5-team8-server">
+<img src="https://img.shields.io/github/issues-pr/wafflestudio/22-5-team8-server?color=deep%20green">
+<img src="https://img.shields.io/github/issues-pr-closed/wafflestudio/22-5-team8-server?color=violet">
+<br><br>
+
 <div align="center">
 <h1>🧇Wachapedia</h1>
 <h4>WaffleStudio 22-5 Team 8 토이프로젝트<h4>
@@ -12,6 +18,10 @@ Wachapedia는 [**왓챠피디아**](https://pedia.watcha.com/ko-KR/)의 클론 �
 <br>왓챠피디아는 사용자들이 영화, 드라마, 도서, 웹툰 등 다양한 콘텐츠에 대해 **별점과 리뷰**를 남기고  이를 바탕으로 개인화된 **추천 서비스**를 제공받을 수 있는 서비스입니다.
 저희 팀에서는 시간상의 한계와 개발 역량을 고려해 영화 컨텐츠에 대해서만 구현하기로 결정하였습니다.
 
+### 💡와챠피디아(Wachapedia)만의 신기능
+-  🔎 왓챠피디아에선 할 수 없었던 장르 필터 검색이 가능합니다. 장르 필터를 사용하면 해당 장르의 영화들을 모아볼 수 있습니다.
+- 🙈 차단하고 싶은 유저가 있으신가요? 유저 블록 기능을 통해, 영화 리뷰 조회 시 해당 유저의 리뷰를 숨길 수 있습니다.
+- ✏️ 영화 N차 관람의 시대. 리뷰에 감상 일자 추가 기능을 만들어 재감상 기록을 남길 수 있습니다.
 
 **메인 기능**
 - [x] 메인 페이지
@@ -25,12 +35,46 @@ Wachapedia는 [**왓챠피디아**](https://pedia.watcha.com/ko-KR/)의 클론 �
 - [x] 검색: 제목, 인물, 컬렉션, 유저, 필터(새로운 기능)
 - [x] 감독/배우 페이지: 작품 목록
 - [x] 평점: 대댓글
+- [x] 컬렉션: 컬렉션 생성/수정 및 컬렉션 댓글
 
 **추가 기능**
 - [x] 캘린더: 어떤 날짜에 뭘 봤는지 달력에 표시
 - [x] 취향 분석: 별점 분포, 선호 태그, 국가, 장르 등
 - [x] 영화 추천 페이지: 예상 평점
 - [x] 유저 차단
+
+
+## Contributors
+<img src="https://img.shields.io/badge/%EC%9D%B4%EA%B2%BD%ED%91%9C-deveroskp-dark_green?link=https%3A%2F%2Fgithub.com%2Fdeveroskp">
+<ul>
+    <li>팀장</li>
+    <li>로그인: 소셜 로그인</li>
+    <li>유저 페이지: 추천 목록, 팔로우, 언팔로우</li>
+    <li>감독/배우 페이지: 작품 목록</li>
+    <li>유저 블록 기능</li>
+</ul>
+
+<img src="https://img.shields.io/badge/%EC%8B%A0%EC%A7%80%EC%9B%90-anandashin-purple?color=9370DB&link=https%3A%2F%2Fgithub.com%2Fanandashin">
+<ul>
+    <li>영화 정보 크롤링: 영화 정보, 코멘트 (장르, 개봉년도, 시놉시스, 출연배우, 포스터, …)</li>
+    <li>검색: 영화</li>
+    <li>컬렉션: 컬렉션 생성/수정 및 컬렉션 댓글</li>
+    <li>CI/CD 구현</li>
+</ul>
+
+<img src="https://img.shields.io/badge/%EA%B9%80%EB%AF%BC%EC%84%B1-minchok125-magenta?link=https%3A%2F%2Fgithub.com%2Fminchok125">
+<ul>
+    <li>평점 : 평점 매기기 · 코멘트 · 좋아요</li>
+    <li>평점: 대댓글</li>
+    <li>영화 추천 페이지: 예상 평점</li>
+</ul>
+
+<img src="https://img.shields.io/badge/%EC%9D%B4%ED%98%B8%EC%84%9D-arcstone09-green?link=https%3A%2F%2Fgithub.com%2Farcstone09">
+<ul>
+    <li>검색: 제목, 인물, 컬렉션, 유저, 필터(새로운 기능)</li>
+    <li>캘린더: 어떤 날짜에 뭘 봤는지 달력에 표시</li>
+    <li>취향 분석: 별점 분포, 선호 태그, 국가, 장르 등</li>
+</ul>
 
 ## 🛠 기술 스택
 
