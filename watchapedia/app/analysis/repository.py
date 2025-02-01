@@ -107,6 +107,7 @@ class UserPreferenceRepository():
                 )
                 .join(MovieParticipant, Review.movie_id == MovieParticipant.movie_id)
                 .filter(MovieParticipant.participant_id == participant_id)
+                .filter(Review.user_id == user_id)
                 .filter(or_(
                 MovieParticipant.role.like("%주연%"),
                 MovieParticipant.role.like("%조연%"),
@@ -127,6 +128,7 @@ class UserPreferenceRepository():
                 )
                 .join(MovieParticipant, Review.movie_id == MovieParticipant.movie_id)
                 .filter(MovieParticipant.participant_id == participant_id)
+                .filter(Review.user_id == user_id)
                 .filter(MovieParticipant.role.like("%감독%"))
                 .filter(MovieParticipant.movie_id.in_(review_movie_ids))
                 .one()
@@ -143,6 +145,7 @@ class UserPreferenceRepository():
                 )
                 .join(MovieGenre, Review.movie_id == MovieGenre.movie_id)
                 .filter(MovieGenre.genre_id == genre_id)
+                .filter(Review.user_id == user_id)
                 .filter(MovieGenre.movie_id.in_(review_movie_ids))
                 .one()  
             )
@@ -158,6 +161,7 @@ class UserPreferenceRepository():
                 )
                 .join(MovieCountry, Review.movie_id == MovieCountry.movie_id)
                 .filter(MovieCountry.country_id == country_id)
+                .filter(Review.user_id == user_id)
                 .filter(MovieCountry.movie_id.in_(review_movie_ids))
                 .one()
             )
