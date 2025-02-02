@@ -138,7 +138,7 @@ class UserRatingService():
 
     def get_user_rating_message(
             self,
-            rating_avg: int
+            rating_avg: float
             ) -> str | None:
         if rating_avg == None:
             return None
@@ -233,7 +233,7 @@ class UserRatingService():
         elif viewing_time < 7711:
             return "경지에 도달한 'Film Master'"
         else:
-            return None
+            return "평가하는거 나름 되게 재밌는데 어서 더 평가를..."
 
     def _process_user_rating_response(self, user_id: int, user_rating: UserRating) -> UserRatingResponse:
         return UserRatingResponse(
