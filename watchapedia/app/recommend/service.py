@@ -66,7 +66,7 @@ class RecommendService():
 
         movie_list = self.movie_service.search_movie_list("")
         movie_list.sort(key = lambda movie : movie.reviews_count, reverse=True)
-        movie_list = movie_list[0:18]
+        movie_list = movie_list[0:10]
 
         user_average = self.user_average_rating(user_id)
 
@@ -86,7 +86,7 @@ class RecommendService():
         expect_num = 0
 
         for movie in movie_list :
-            if expect_num >= 8 :
+            if expect_num >= 7 :
                 break
 
             if movie.average_rating is None :
