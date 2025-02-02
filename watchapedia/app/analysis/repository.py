@@ -185,7 +185,7 @@ class UserPreferenceRepository():
                 if movie_count_actor == 0:
                     pass
                 else:
-                    if rating_actor == None:
+                    if rating_actor == 0:
                         # 해당 영화 리뷰는 있지만, 평점이 없는 경우.
                         actor_dict_cur[pid] = (50+50*(movie_count_actor/(movie_count_actor+10)), movie_count_actor)
                     else:
@@ -199,7 +199,7 @@ class UserPreferenceRepository():
                 if movie_count_director == 0:
                     pass
                 else:
-                    if rating_director == None:
+                    if rating_director == 0:
                         director_dict_cur[pid] = (50+50*(movie_count_director/(movie_count_director+10)), movie_count_director)
                     else:
                         director_dict_cur[pid] = (max(0, min(100,50+(rating_director-rating_avg_tot)*100*(movie_count_director/math.log(rating_num_tot+2))**0.5+50*(movie_count_director/(movie_count_director+10)))), movie_count_director)
@@ -212,7 +212,7 @@ class UserPreferenceRepository():
                 if movie_count_genre == 0:
                     pass
                 else:
-                    if rating_genre == None:
+                    if rating_genre == 0:
                         genre_dict_cur[pid] = (50+50*(movie_count_genre/(movie_count_genre+10)), movie_count_genre)
                     else:
                         genre_dict_cur[pid] = (max(0, min(100,50+(rating_genre-rating_avg_tot)*100*(movie_count_genre/math.log(rating_num_tot+2))**0.5+50*(movie_count_genre/(movie_count_genre+10)))), movie_count_genre)
@@ -225,7 +225,7 @@ class UserPreferenceRepository():
                 if movie_count_country == 0:
                     pass
                 else:
-                    if rating_country == None:
+                    if rating_country == 0:
                         country_dict_cur[pid] = (50+50*(movie_count_country/(movie_count_country+10)), movie_count_country)
                     else:
                         country_dict_cur[pid] = (max(0, min(100,50+(rating_country-rating_avg_tot)*100*(movie_count_country/math.log(rating_num_tot+2))**0.5+50*(movie_count_country/(movie_count_country+10)))), movie_count_country)
@@ -361,7 +361,7 @@ class UserRatingRepository():
         query = self.session.query(
             func.count(Review.id).label("count"),
             func.avg(Review.rating).cast(Float).label("average")
-        ).filter(Review.user_id == user_id, Review.rating.isnot(None))
+        ).filter(Review.user_id == user_id, Review.rating.isnot(None), Review.rating !=0)
 
         result = query.first()
 
@@ -377,7 +377,7 @@ class UserRatingRepository():
             ) -> dict:
         distribution = (
                 self.session.query(Review.rating, func.count(Review.rating).label("count"))
-                .filter(Review.user_id == user_id, Review.rating.isnot(None))
+                .filter(Review.user_id == user_id, Review.rating.isnot(None), Review.rating !=0)
                 .group_by(Review.rating)
                 .order_by(Review.rating.asc())
                 .all()
